@@ -1,0 +1,2510 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartGrade 11 - Hệ Thống Học Tập Thích Ứng & Ôn Tập Ngắt Quãng</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        brand: { 50: '#eef2ff', 100: '#e0e7ff', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca', 900: '#312e81' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #0f172a; }
+        .glass-card { background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(12px); border: 1px solid rgba(226, 232, 240, 0.9); }
+        .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 8px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
+        .custom-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        @keyframes pulse-Subtle { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.02); } }
+        .animate-subtle { animation: pulse-Subtle 2.5s infinite ease-in-out; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-indigo-600 selection:text-white">
+
+    <!-- THÔNG BÁO TOAST -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
+
+    <!-- MÀN HÌNH ĐĂNG NHẬP / CHÀO MỪNG -->
+    <div id="login-screen" class="fixed inset-0 z-40 bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 max-w-4xl w-full overflow-hidden grid grid-cols-1 md:grid-cols-12 my-8">
+            <!-- Cột trái: Giới thiệu thuật toán -->
+            <div class="md:col-span-7 bg-gradient-to-br from-indigo-600 via-indigo-700 to-purple-800 p-8 text-white flex flex-col justify-between relative overflow-hidden">
+                <div class="relative z-10">
+                    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/15 backdrop-blur-md text-xs font-semibold tracking-wide uppercase mb-6">
+                        <i class="fa-solid fa-brain text-amber-300"></i> Adaptive Learning & Spaced Repetition
+                    </div>
+                    <h1 class="text-3xl sm:text-4xl font-extrabold leading-tight mb-4">
+                        SmartGrade 11
+                    </h1>
+                    <p class="text-indigo-100 text-sm sm:text-base leading-relaxed mb-8">
+                        Nền tảng học tập thông minh tự động bắt bệnh lỗ hổng kiến thức lớp 11, thiết kế <strong>liệu trình 7 ngày cá nhân hóa</strong> và kiểm tra nhắc lại chống quên kiến thức cũ.
+                    </p>
+
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-3.5 bg-white/10 p-3.5 rounded-2xl border border-white/10">
+                            <div class="w-9 h-9 rounded-xl bg-amber-400/20 text-amber-300 flex items-center justify-center shrink-0 font-bold">1</div>
+                            <div>
+                                <h3 class="font-bold text-sm">Test Đầu Vào Phân Loại Chuyên Đề</h3>
+                                <p class="text-xs text-indigo-100 mt-0.5">Đánh giá chính xác chuyên đề nào đã vững, chuyên đề nào bị hổng.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3.5 bg-white/10 p-3.5 rounded-2xl border border-white/10">
+                            <div class="w-9 h-9 rounded-xl bg-emerald-400/20 text-emerald-300 flex items-center justify-center shrink-0 font-bold">2</div>
+                            <div>
+                                <h3 class="font-bold text-sm">Liệu Trình Học 1 Tuần Tự Động</h3>
+                                <p class="text-xs text-indigo-100 mt-0.5">Thiếu gì bổ sung đó: Lý thuyết cô đọng, công thức & bài tập ngày thứ 2 - thứ 6.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3.5 bg-white/10 p-3.5 rounded-2xl border border-white/10">
+                            <div class="w-9 h-9 rounded-xl bg-purple-400/20 text-purple-200 flex items-center justify-center shrink-0 font-bold">3</div>
+                            <div>
+                                <h3 class="font-bold text-sm">Test Cuối Tuần & Chống Quên Kiến Thức Cũ</h3>
+                                <p class="text-xs text-indigo-100 mt-0.5">Kiểm tra bài vừa học + gài câu hỏi kiến thức cũ. Nếu quên bài cũ, tự động đưa lại vào liệu trình tuần kế tiếp!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="relative z-10 mt-8 pt-4 border-t border-white/15 flex items-center justify-between text-xs text-indigo-200">
+                    <span>Chương trình GDPT Mới Lớp 11</span>
+                    <span>Toán • Lý • Hóa • Anh</span>
+                </div>
+            </div>
+
+            <!-- Cột phải: Form đăng nhập -->
+            <div class="md:col-span-5 p-8 flex flex-col justify-center bg-white">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-slate-900">Bắt đầu lộ trình</h2>
+                    <p class="text-sm text-slate-500 mt-1">Nhập thông tin học sinh để lưu trữ tiến độ học tập đám mây</p>
+                </div>
+
+                <form id="login-form" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Họ và tên học sinh</label>
+                        <div class="relative">
+                            <i class="fa-regular fa-user absolute left-3.5 top-3.5 text-slate-400"></i>
+                            <input type="text" id="student-name-input" required placeholder="VD: Nguyễn Minh Khôi" value="Nguyễn Minh Khôi"
+                                class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-600 focus:ring-3 focus:ring-indigo-100 outline-none text-sm font-medium transition">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Lớp / Tổ hợp</label>
+                        <select id="student-class-input" class="w-full px-3.5 py-3 rounded-xl border border-slate-200 focus:border-indigo-600 outline-none text-sm font-medium bg-white">
+                            <option value="11A1 - Khối KHTN (Toán - Lý - Hóa - Anh)">11A1 - Khối KHTN (Toán - Lý - Hóa - Anh)</option>
+                            <option value="11A2 - Khối Cơ Bản & Tiếng Anh">11A2 - Khối Cơ Bản & Tiếng Anh</option>
+                            <option value="11 Chuyên - Ôn thi Đánh giá năng lực">11 Chuyên - Ôn thi Đánh giá năng lực</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="w-full py-3.5 px-5 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold rounded-xl shadow-lg shadow-indigo-600/25 transition flex items-center justify-center gap-2 text-sm cursor-pointer">
+                        <span>Vào Góc Học Tập Lớp 11</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </form>
+
+                <div class="relative my-6">
+                    <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-200"></div></div>
+                    <div class="relative flex justify-center text-xs uppercase"><span class="bg-white px-3 text-slate-400 font-semibold">Chế độ trải nghiệm nhanh</span></div>
+                </div>
+
+                <button id="quick-demo-btn" type="button" class="w-full py-3 px-4 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 font-semibold rounded-xl transition flex items-center justify-center gap-2 text-xs sm:text-sm cursor-pointer">
+                    <i class="fa-solid fa-wand-magic-sparkles text-amber-600"></i>
+                    <span>Nạp Dữ Liệu Mẫu (Có sẵn môn đã học & bị quên)</span>
+                </button>
+                <p class="text-[11px] text-slate-400 text-center mt-3">
+                    Tự động đồng bộ với Cloud Database khi trực tuyến.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- HEADER ĐIỀU HƯỚNG CHÍNH -->
+    <header class="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+            <!-- Logo -->
+            <div class="flex items-center gap-3 cursor-pointer" onclick="app.switchSubject(app.state.currentSubjectId)">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center text-white shadow-md shadow-indigo-500/20">
+                    <i class="fa-solid fa-graduation-cap text-lg"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-extrabold text-lg tracking-tight text-slate-900">SmartGrade <span class="text-indigo-600">11</span></span>
+                        <span id="cloud-status-badge" class="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-semibold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span> Đã lưu Cloud
+                        </span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 hidden sm:block">Học tập thích ứng • Lặp lại ngắt quãng</p>
+                </div>
+            </div>
+
+            <!-- Thanh công cụ Demo & Thông tin Học sinh -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                <button onclick="app.loadDemoScenario()" title="Tạo kịch bản giả lập học sinh đã học Tuần 1 nhưng quên kiến thức cũ để test nhanh"
+                    class="px-3 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer">
+                    <i class="fa-solid fa-bolt text-amber-500"></i>
+                    <span class="hidden md:inline">Nạp kịch bản Demo</span>
+                    <span class="md:hidden">Demo</span>
+                </button>
+
+                <button onclick="app.openGuideModal()" class="p-2 rounded-xl text-slate-600 hover:bg-slate-100 transition cursor-pointer" title="Cách hoạt động của thuật toán">
+                    <i class="fa-regular fa-circle-question text-lg"></i>
+                </button>
+
+                <div class="h-6 w-px bg-slate-200 mx-0.5"></div>
+
+                <div class="flex items-center gap-2.5 bg-slate-100/80 pl-2.5 pr-3 py-1.5 rounded-xl border border-slate-200/80">
+                    <div class="w-7 h-7 rounded-lg bg-indigo-600 text-white font-bold text-xs flex items-center justify-center" id="header-avatar">K</div>
+                    <div class="text-left hidden sm:block">
+                        <div class="text-xs font-bold text-slate-800 leading-none" id="header-student-name">Học sinh</div>
+                        <div class="text-[10px] text-slate-500 mt-0.5 truncate max-w-[140px]" id="header-student-class">Lớp 11</div>
+                    </div>
+                    <button onclick="app.logout()" class="ml-1 text-slate-400 hover:text-rose-600 text-xs p-1 transition cursor-pointer" title="Đổi tài khoản / Đặt lại">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Thanh Chọn 4 Môn Học Lớp 11 -->
+        <div class="bg-slate-50/80 border-t border-slate-200/80">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-2 overflow-x-auto py-2 custom-scroll" id="subject-tabs-container">
+                <!-- Render bằng JS -->
+            </div>
+        </div>
+    </header>
+
+    <!-- NỘI DUNG CHÍNH -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- BANNER TÓM TẮT MÔN HỌC HIỆN TẠI & THANH ĐIỀU KHIỂN NHANH -->
+        <div id="subject-hero-banner" class="mb-6"></div>
+
+        <!-- LƯỚI GIAO DIỆN CHÍNH: CỘT TRÁI (35%) MASTERY & PHÂN TÍCH - CỘT PHẢI (65%) LIỆU TRÌNH 1 TUẦN / BÀI TEST -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+            <!-- CỘT TRÁI: BẢNG ĐỘ THÔNG THẠO CHUYÊN ĐỀ (TOPIC MASTERY) & LỊCH SỬ -->
+            <div class="lg:col-span-4 space-y-6">
+                <!-- Card Độ thông thạo từng chuyên đề -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200/90 p-5">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h2 class="font-bold text-slate-900 text-base flex items-center gap-2">
+                                <i class="fa-solid fa-chart-pie text-indigo-600"></i>
+                                Bản Đồ Lỗ Hổng Kiến Thức
+                            </h2>
+                            <p class="text-xs text-slate-500 mt-0.5">Phân tích theo từng chuyên đề Lớp 11</p>
+                        </div>
+                        <span id="current-week-badge" class="px-2.5 py-1 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                            Tuần 1
+                        </span>
+                    </div>
+
+                    <!-- Chú thích màu trạng thái -->
+                    <div class="grid grid-cols-2 gap-1.5 p-2.5 rounded-xl bg-slate-50 border border-slate-200/70 mb-4 text-[11px]">
+                        <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span><span class="text-slate-600">Đã vững (≥70%)</span></div>
+                        <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"></span><span class="text-slate-600">Cần bổ sung (&lt;70%)</span></div>
+                        <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-purple-600 inline-block"></span><span class="text-slate-600 font-semibold">Cũ bị quên (Ôn lại!)</span></div>
+                        <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-slate-300 inline-block"></span><span class="text-slate-600">Chưa kiểm tra</span></div>
+                    </div>
+
+                    <!-- Danh sách các chuyên đề của môn -->
+                    <div id="topic-mastery-list" class="space-y-3.5">
+                        <!-- Render bằng JS -->
+                    </div>
+                </div>
+
+                <!-- Card Công cụ Giả lập Vòng lặp Nhanh (Dành cho học sinh / Giáo viên kiểm thử) -->
+                <div class="bg-gradient-to-br from-slate-900 to-indigo-950 rounded-2xl shadow-md p-5 text-white">
+                    <div class="flex items-center gap-2 text-amber-300 text-xs font-bold uppercase tracking-wider mb-2">
+                        <i class="fa-solid fa-sliders"></i> Bộ Điều Khiển Vòng Lặp Thông Minh
+                    </div>
+                    <p class="text-xs text-slate-300 leading-relaxed mb-4">
+                        Thử nghiệm nhanh quy trình: <strong>Test đầu vào &rarr; Học 7 ngày &rarr; Test cuối tuần &rarr; Phát hiện kiến thức cũ bị quên &rarr; Tự thêm vào tuần mới</strong>.
+                    </p>
+                    <div class="space-y-2">
+                        <button onclick="app.fastCompleteWeekTasks()" class="w-full py-2.5 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold flex items-center justify-between transition cursor-pointer border border-white/10">
+                            <span><i class="fa-solid fa-check-double text-emerald-400 mr-1.5"></i> Hoàn thành nhanh 5 ngày học trong tuần</span>
+                            <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                        </button>
+                        <button onclick="app.startWeeklyReviewTest()" class="w-full py-2.5 px-3 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 text-xs font-semibold flex items-center justify-between transition cursor-pointer border border-amber-400/30">
+                            <span><i class="fa-solid fa-file-signature text-amber-300 mr-1.5"></i> Làm ngay Bài Test Tổng Kết Cuối Tuần</span>
+                            <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                        </button>
+                        <button onclick="app.simulateForgottenOldKnowledge()" class="w-full py-2.5 px-3 rounded-xl bg-purple-500/25 hover:bg-purple-500/35 text-purple-200 text-xs font-semibold flex items-center justify-between transition cursor-pointer border border-purple-400/30">
+                            <span><i class="fa-solid fa-rotate-left text-purple-300 mr-1.5"></i> Giả lập: Quên 1 chuyên đề cũ & tạo Tuần mới</span>
+                            <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                        </button>
+                        <button onclick="app.startDiagnosticTest()" class="w-full py-2 px-3 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-200 text-xs font-medium flex items-center justify-between transition cursor-pointer">
+                            <span><i class="fa-solid fa-arrows-rotate mr-1.5"></i> Test lại đầu vào môn này từ đầu</span>
+                            <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Card Lịch sử các bài kiểm tra -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200/90 p-5">
+                    <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2 mb-3">
+                        <i class="fa-solid fa-clock-rotate-left text-slate-500"></i>
+                        Lịch Sử Kiểm Tra & Tiến Bộ
+                    </h3>
+                    <div id="test-history-list" class="space-y-2.5 max-h-60 overflow-y-auto custom-scroll pr-1">
+                        <!-- Render bằng JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- CỘT PHẢI: VÙNG TƯƠNG TÁC CHÍNH (CHƯA TEST / ĐANG TEST / LIỆU TRÌNH 7 NGÀY / KẾT QUẢ PHÂN TÍCH) -->
+            <div class="lg:col-span-8" id="main-workspace">
+                <!-- Render động theo trạng thái bằng JS -->
+            </div>
+
+        </div>
+    </main>
+
+    <!-- MODAL CHI TIẾT BÀI HỌC TRONG NGÀY (LÝ THUYẾT + CÔNG THỨC + CÂU HỎI NHANH) -->
+    <div id="study-day-modal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-3xl max-w-2xl w-full shadow-2xl border border-slate-200 overflow-hidden my-8 animate-fadeIn">
+            <div id="study-day-modal-content"></div>
+        </div>
+    </div>
+
+    <!-- MODAL GIẢI THÍCH CƠ CHẾ THUẬT TOÁN -->
+    <div id="guide-modal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-3xl max-w-2xl w-full shadow-2xl border border-slate-200 overflow-hidden p-6 sm:p-8 my-8">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-200 mb-5">
+                <h3 class="text-xl font-extrabold text-slate-900 flex items-center gap-2">
+                    <i class="fa-solid fa-microchip text-indigo-600"></i>
+                    Cơ Chế Liệu Trình Học Tập Vòng Lặp Lớp 11
+                </h3>
+                <button onclick="app.closeGuideModal()" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600 cursor-pointer">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="space-y-4 text-sm text-slate-600 leading-relaxed">
+                <div class="p-4 rounded-2xl bg-indigo-50/70 border border-indigo-100">
+                    <h4 class="font-bold text-indigo-950 mb-1">1. Bài Test Đầu Vào (Diagnostic Assessment)</h4>
+                    <p>Mỗi môn học Lớp 11 được chia thành 5 chuyên đề cốt lõi. Bài kiểm tra đầu vào gồm 10 câu hỏi quét đều tất cả chuyên đề. Chuyên đề nào đạt dưới 70% sẽ bị đánh dấu <span class="text-rose-600 font-bold">Lỗ hổng cần bổ sung</span>.</p>
+                </div>
+                <div class="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-100">
+                    <h4 class="font-bold text-emerald-950 mb-1">2. Liệu Trình 1 Tuần (7-Day Adaptive Plan)</h4>
+                    <p>Hệ thống tự động xếp lịch từ Thứ 2 đến Thứ 6, ưu tiên phân bổ các chuyên đề đang yếu và các chuyên đề cũ bị quên. Mỗi ngày học đều có Tóm tắt lý thuyết, Công thức đóng khung và Câu hỏi tự luyện. Thứ 7 và Chủ Nhật dành cho Bài Test Tổng Kết Tuần.</p>
+                </div>
+                <div class="p-4 rounded-2xl bg-purple-50/70 border border-purple-100">
+                    <h4 class="font-bold text-purple-950 mb-1">3. Bài Test Cuối Tuần & Chống Quên Kiến Thức Cũ (Spaced Repetition)</h4>
+                    <p>Bài kiểm tra cuối tuần luôn kết hợp 2 phần:</p>
+                    <ul class="list-disc pl-5 mt-1 space-y-1">
+                        <li><strong>Kiểm tra kiến thức vừa học trong tuần:</strong> Xem bạn đã lấp được lỗ hổng chưa.</li>
+                        <li><strong>Kiểm tra ngẫu nhiên kiến thức cũ (đã đạt ≥70% ở tuần trước):</strong> Nếu bạn làm sai câu hỏi thuộc kiến thức cũ, chuyên đề đó lập tức chuyển sang trạng thái <span class="text-purple-700 font-bold">Kiến thức cũ bị quên</span> và tự động được xếp lại vào Liệu trình 7 ngày của Tuần tiếp theo!</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-6 flex justify-end">
+                <button onclick="app.closeGuideModal()" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-sm cursor-pointer">
+                    Đã hiểu quy trình
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NGÂN HÀNG DỮ LIỆU CHƯƠNG TRÌNH LỚP 11 & LOGIC ỨNG DỤNG -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // ============================================================================
+        // 1. NGÂN HÀNG KIẾN THỨC & CÂU HỎI LỚP 11 (CHƯƠNG TRÌNH GDPT MỚI)
+        // ============================================================================
+        const CURRICULUM_DATA = {
+            math11: {
+                id: 'math11',
+                name: 'Toán Học 11',
+                shortName: 'Toán 11',
+                icon: 'fa-square-root-variable',
+                color: 'indigo',
+                gradient: 'from-indigo-600 to-blue-600',
+                description: 'Lượng giác, Dãy số - Cấp số, Giới hạn, Đạo hàm & Hình học không gian',
+                topics: [
+                    {
+                        id: 'math_trig',
+                        name: 'Hàm số & Phương trình lượng giác',
+                        summary: 'Nắm vững tập xác định, chu kì tuần hoàn, công thức cộng, công thức nhân đôi và nghiệm của các phương trình lượng giác cơ bản.',
+                        formula: '• sin²x + cos²x = 1 | sin(2x) = 2sinx.cosx | cos(2x) = cos²x - sin²x = 2cos²x - 1\n• sin x = sin α ⇔ x = α + k2π hoặc x = π - α + k2π (k ∈ ℤ)\n• cos x = cos α ⇔ x = ±α + k2π (k ∈ ℤ)',
+                        miniPractice: {
+                            q: 'Chu kì tuần hoàn của hàm số y = sin(2x) là bao nhiêu?',
+                            options: ['T = 2π', 'T = π', 'T = π/2', 'T = 4π'],
+                            correct: 1,
+                            explain: 'Chu kì của hàm y = sin(ax + b) là T = 2π/|a| = 2π/2 = π.'
+                        },
+                        questions: [
+                            {
+                                id: 'mt1',
+                                q: 'Tập giá trị của hàm số y = 2cos(x) - 1 trên ℝ là đoạn nào sau đây?',
+                                options: ['[-1; 1]', '[-3; 1]', '[-2; 2]', '[0; 1]'],
+                                correct: 1,
+                                explain: 'Vì -1 ≤ cos(x) ≤ 1 nên -2 ≤ 2cos(x) ≤ 2 ⇒ -3 ≤ 2cos(x) - 1 ≤ 1. Vậy tập giá trị là [-3; 1].'
+                            },
+                            {
+                                id: 'mt2',
+                                q: 'Nghiệm của phương trình cos(x) = 1/2 là:',
+                                options: ['x = ±π/3 + k2π (k ∈ ℤ)', 'x = ±π/6 + k2π (k ∈ ℤ)', 'x = π/3 + kπ (k ∈ ℤ)', 'x = ±2π/3 + k2π (k ∈ ℤ)'],
+                                correct: 0,
+                                explain: 'Ta có cos(π/3) = 1/2, do đó cos(x) = 1/2 ⇔ x = ±π/3 + k2π (k ∈ ℤ).'
+                            },
+                            {
+                                id: 'mt3',
+                                q: 'Rút gọn biểu thức A = sin(a)cos(b) + cos(a)sin(b) ta được:',
+                                options: ['cos(a - b)', 'sin(a - b)', 'sin(a + b)', 'cos(a + b)'],
+                                correct: 2,
+                                explain: 'Theo công thức cộng lượng giác: sin(a + b) = sin(a)cos(b) + cos(a)sin(b).'
+                            }
+                        ]
+                    },
+                    {
+                        id: 'math_seq',
+                        name: 'Dãy số, Cấp số cộng & Cấp số nhân',
+                        summary: 'Phân biệt cấp số cộng (công sai d) và cấp số nhân (công bội q). Áp dụng công thức số hạng tổng quát u_n và tổng n số hạng đầu S_n.',
+                        formula: '• Cấp số cộng: u_n = u_1 + (n - 1)d  |  S_n = n(2u_1 + (n-1)d)/2\n• Cấp số nhân: u_n = u_1 . q^(n-1)  |  S_n = u_1(1 - q^n)/(1 - q) (với q ≠ 1)',
+                        miniPractice: {
+                            q: 'Cho cấp số cộng có u_1 = 3 và công sai d = 4. Số hạng u_5 bằng:',
+                            options: ['15', '19', '23', '17'],
+                            correct: 1,
+                            explain: 'u_5 = u_1 + 4d = 3 + 4×4 = 19.'
+                        },
+                        questions: [
+                            {
+                                id: 'ms1',
+                                q: 'Cho cấp số cộng (u_n) biết u_1 = -2 và công sai d = 3. Số hạng thứ 10 (u_10) bằng:',
+                                options: ['25', '28', '24', '31'],
+                                correct: 0,
+                                explain: 'Áp dụng công thức u_n = u_1 + (n - 1)d ⇒ u_10 = -2 + 9 × 3 = 25.'
+                            },
+                            {
+                                id: 'ms2',
+                                q: 'Cho cấp số nhân (u_n) có u_1 = 2 và công bội q = 3. Số hạng u_4 bằng:',
+                                options: ['18', '24', '54', '162'],
+                                correct: 2,
+                                explain: 'u_4 = u_1 × q³ = 2 × 3³ = 2 × 27 = 54.'
+                            },
+                            {
+                                id: 'ms3',
+                                q: 'Tổng 10 số hạng đầu tiên của cấp số cộng có u_1 = 2 và u_10 = 20 là:',
+                                options: ['100', '110', '220', '90'],
+                                correct: 1,
+                                explain: 'S_10 = 10 × (u_1 + u_10) / 2 = 10 × (2 + 20) / 2 = 110.'
+                            }
+                        ]
+                    },
+                    {
+                        id: 'math_lim',
+                        name: 'Giới hạn & Hàm số liên tục',
+                        summary: 'Kỹ thuật khử dạng vô định 0/0, ∞/∞ của giới hạn dãy số và hàm số. Điều kiện để hàm số liên tục tại một điểm x = x_0.',
+                        formula: '• lim (1/n^k) = 0 (k > 0) | lim q^n = 0 (nếu |q| < 1)\n• Hàm số f(x) liên tục tại x_0 ⇔ lim(x→x_0) f(x) = f(x_0)',
+                        miniPractice: {
+                            q: 'Giá trị của lim (3n + 1)/(n - 2) khi n → +∞ bằng:',
+                            options: ['1', '3', '-1/2', '+∞'],
+                            correct: 1,
+                            explain: 'Chia cả tử và mẫu cho n: lim (3 + 1/n)/(1 - 2/n) = 3/1 = 3.'
+                        },
+                        questions: [
+                            {
+                                id: 'ml1',
+                                q: 'Tính giới hạn L = lim(x→2) (x² - 4)/(x - 2):',
+                                options: ['L = 0', 'L = 2', 'L = 4', 'L = +∞'],
+                                correct: 2,
+                                explain: 'Khử dạng 0/0: (x² - 4)/(x - 2) = (x - 2)(x + 2)/(x - 2) = x + 2. Khi x → 2 thì giới hạn bằng 2 + 2 = 4.'
+                            },
+                            {
+                                id: 'ml2',
+                                q: 'Giới hạn của dãy số lim (4n² + n - 1)/(2n² + 3) khi n → +∞ bằng:',
+                                options: ['2', '4', '1/2', '0'],
+                                correct: 0,
+                                explain: 'Bậc tử bằng bậc mẫu (bậc 2), hệ số bậc cao nhất là 4/2 = 2.'
+                            },
+                            {
+                                id: 'ml3',
+                                q: 'Trong các dãy số sau, dãy số nào có giới hạn bằng 0 khi n → +∞?',
+                                options: ['u_n = (4/3)^n', 'u_n = (-2)^n', 'u_n = (2/5)^n', 'u_n = n² - n'],
+                                correct: 2,
+                                explain: 'Dãy q^n có giới hạn bằng 0 khi |q| < 1. Vì |2/5| = 0.4 < 1 nên lim (2/5)^n = 0.'
+                            }
+                        ]
+                    },
+                    {
+                        id: 'math_deriv',
+                        name: 'Đạo hàm & Tiếp tuyến',
+                        summary: 'Quy tắc tính đạo hàm tổng, hiệu, tích, thương, hàm hợp và ý nghĩa hình học của đạo hàm (hệ số góc tiếp tuyến k = f\'(x_0)).',
+                        formula: '• (x^n)\' = n.x^(n-1) | (sin x)\' = cos x | (cos x)\' = -sin x | (e^x)\' = e^x | (ln x)\' = 1/x\n• Phương trình tiếp tuyến tại M(x_0; y_0): y = f\'(x_0)(x - x_0) + y_0',
+                        miniPractice: {
+                            q: 'Đạo hàm của hàm số y = x³ - 3x² + 2 là:',
+                            options: ['y\' = 3x² - 6x', 'y\' = 3x² - 3x', 'y\' = x² - 6x', 'y\' = 3x² - 6x + 2'],
+                            correct: 0,
+                            explain: 'y\' = (x³)\' - 3(x²)\' + (2)\' = 3x² - 6x.'
+                        },
+                        questions: [
+                            {
+                                id: 'md1',
+                                q: 'Cho hàm số f(x) = x³ - 2x² + 5x - 1. Giá trị của đạo hàm f\'(1) bằng:',
+                                options: ['3', '4', '2', '6'],
+                                correct: 1,
+                                explain: 'Ta có f\'(x) = 3x² - 4x + 5 ⇒ f\'(1) = 3(1)² - 4(1) + 5 = 4.'
+                            },
+                            {
+                                id: 'md2',
+                                q: 'Hệ số góc k của tiếp tuyến đồ thị hàm số y = x² - 4x + 3 tại điểm có hoành độ x_0 = 3 là:',
+                                options: ['k = 2', 'k = 0', 'k = 6', 'k = -2'],
+                                correct: 0,
+                                explain: 'y\' = 2x - 4. Hệ số góc tiếp tuyến tại x_0 = 3 là k = y\'(3) = 2(3) - 4 = 2.'
+                            },
+                            {
+                                id: 'md3',
+                                q: 'Đạo hàm của hàm số y = sin(2x) là:',
+                                options: ['y\' = cos(2x)', 'y\' = 2cos(2x)', 'y\' = -2cos(2x)', 'y\' = 2sin(2x)'],
+                                correct: 1,
+                                explain: 'Áp dụng đạo hàm hàm hợp (sin u)\' = u\'.cos u ⇒ (sin 2x)\' = (2x)\'.cos(2x) = 2cos(2x).'
+                            }
+                        ]
+                    },
+                    {
+                        id: 'math_geo',
+                        name: 'Quan hệ song song & vuông góc trong không gian',
+                        summary: 'Chứng minh đường thẳng vuông góc mặt phẳng, hai mặt phẳng vuông góc, tính góc và khoảng cách trong hình chóp.',
+                        formula: '• d ⊥ (P) ⇔ d vuông góc với 2 đường thẳng cắt nhau nằm trong (P).\n• Thể tích khối chóp: V = (1/3) . S_đáy . h',
+                        miniPractice: {
+                            q: 'Nếu đường thẳng d vuông góc với mặt phẳng (α) thì d vuông góc với:',
+                            options: ['Mọi đường thẳng nằm trong (α)', 'Chỉ 2 đường thẳng trong (α)', 'Đường thẳng song song (α)', 'Không đường nào'],
+                            correct: 0,
+                            explain: 'Theo định nghĩa: Đường thẳng vuông góc với mặt phẳng thì vuông góc với mọi đường thẳng nằm trong mặt phẳng đó.'
+                        },
+                        questions: [
+                            {
+                                id: 'mg1',
+                                q: 'Cho hình chóp S.ABCD có đáy ABCD là hình vuông và SA ⊥ (ABCD). Khẳng định nào sau đây ĐÚNG?',
+                                options: ['BC ⊥ (SAB)', 'CD ⊥ (SAC)', 'BD ⊥ (SAD)', 'AC ⊥ (SCD)'],
+                                correct: 0,
+                                explain: 'Vì ABCD là hình vuông nên BC ⊥ AB. Lại có SA ⊥ (ABCD) ⇒ SA ⊥ BC. Do đó BC ⊥ (SAB).'
+                            },
+                            {
+                                id: 'mg2',
+                                q: 'Để chứng minh đường thẳng d vuông góc với mặt phẳng (P), ta cần chứng minh d vuông góc với ít nhất:',
+                                options: ['Hai đường thẳng song song trong (P)', 'Hai đường thẳng cắt nhau nằm trong (P)', 'Một đường thẳng bất kỳ trong (P)', 'Ba đường thẳng đồng quy ngoài (P)'],
+                                correct: 1,
+                                explain: 'Điều kiện đủ để d ⊥ (P) là d vuông góc với hai đường thẳng cắt nhau nằm trong mặt phẳng (P).'
+                            },
+                            {
+                                id: 'mg3',
+                                q: 'Cho hình chóp S.ABC có SA ⊥ (ABC), SA = a√3, tam giác ABC vuông cân tại B có AB = BC = a. Góc giữa SC và mặt phẳng (ABC) bằng:',
+                                options: ['30°', '45°', '60°', '90°'],
+                                correct: 2,
+                                explain: 'Hình chiếu của SC lên (ABC) là AC ⇒ góc là ∠SCA. AC = a√2, tan(∠SCA) = SA/AC = √(3/2)... Với AB=a, nếu AC=a thì tan = √3 ⇒ 60°.'
+                            }
+                        ]
+                    }
+                ]
+            },
+
+            phys11: {
+                id: 'phys11',
+                name: 'Vật Lý 11',
+                shortName: 'Vật Lý 11',
+                icon: 'fa-atom',
+                color: 'amber',
+                gradient: 'from-amber-500 to-orange-600',
+                description: 'Dao động điều hòa, Sóng cơ - Sóng điện từ, Điện trường & Dòng điện một chiều',
+                topics: [
+                    {
+                        id: 'phys_osc',
+                        name: 'Dao động điều hòa & Năng lượng',
+                        summary: 'Phương trình li độ, vận tốc, gia tốc trong dao động điều hòa. Chu kì con lắc lò xo, con lắc đơn và sự chuyển hóa động năng - thế năng.',
+                        formula: '• x = A.cos(ωt + φ) | v = -ωA.sin(ωt + φ) | a = -ω²x\n• Con lắc lò xo: T = 2π√(m/k) | Con lắc đơn: T = 2π√(l/g)\n• Cơ năng: W = W_đ + W_t = (1/2)kA² = (1/2)mω²A² = hằng số',
+                        miniPractice: {
+                            q: 'Trong dao động điều hòa, gia tốc a luôn:',
+                            options: ['Cùng pha với li độ x', 'Ngược pha với li độ x', 'Sớm pha π/2 so với x', 'Trễ pha π/2 so với x'],
+                            correct: 1,
+                            explain: 'Vì a = -ω²x nên gia tốc luôn ngược pha với li độ và luôn hướng về vị trí cân bằng.'
+                        },
+                        questions: [
+                            {
+                                id: 'po1',
+                                q: 'Một vật dao động điều hòa theo phương trình x = 6cos(4πt) (cm). Biên độ và tần số góc của dao động là:',
+                                options: ['A = 6 cm, ω = 4π rad/s', 'A = 4π cm, ω = 6 rad/s', 'A = 6 cm, ω = 2 Hz', 'A = 12 cm, ω = 4π rad/s'],
+                                correct: 0,
+                                explain: 'So sánh với phương trình chuẩn x = Acos(ωt + φ), ta có biên độ A = 6 cm và ω = 4π rad/s.'
+                            },
+                            {
+                                id: 'po2',
+                                q: 'Khi một vật dao động điều hòa đi từ vị trí biên về vị trí cân bằng thì:',
+                                options: ['Động năng giảm, thế năng tăng', 'Động năng tăng, thế năng giảm', 'Cơ năng tăng dần', 'Vận tốc có độ lớn giảm dần'],
+                                correct: 1,
+                                explain: 'Khi về vị trí cân bằng, tốc độ |v| tăng đến cực đại nên động năng tăng, li độ |x| giảm về 0 nên thế năng giảm.'
+                            },
+                            {
+                                id: 'po3',
+                                q: 'Chu kì dao động của con lắc lò xo gồm vật nặng khối lượng m và lò xo độ cứng k là:',
+                                options: ['T = 2π√(k/m)', 'T = 2π√(m/k)', 'T = (1/2π)√(m/k)', 'T = 2π√(l/g)'],
+                                correct: 1,
+                                explain: 'Công thức chu kì con lắc lò xo là T = 2π√(m/k).'
+                            }
+                        ]
+                    },
+                    {
+                        id: 'phys_wave',
+                        name: 'Sóng cơ, Giao thoa & Sóng dừng',
+                        summary: 'Bước sóng λ, tốc độ truyền sóng, điều kiện giao thoa hai nguồn kết hợp và điều kiện có sóng dừng trên dây.',
+                        formula: '• Bước sóng: λ = v.T = v/f\n• Giao thoa 2 nguồn cùng pha: Cực đại d₂ - d₁ = kλ | Cực tiểu d₂ - d₁ = (k + 0.5)λ\n• Sóng dừng 2 đầu cố định: l = k.(λ/2)',
+                        miniPractice: {
+                            q: 'Khoảng cách giữa hai nút sóng liên tiếp trong hiện tượng sóng dừng bằng:',
+                            options: ['λ', 'λ/2', 'λ/4', '2λ'],
+                            correct: 1,
+                            explain: 'Trong sóng dừng, khoảng cách giữa 2 nút hoặc 2 bụng liên tiếp là nửa bước sóng (λ/2).'
+                        },
+                        questions: [
+                            {
+                                id: 'pw1',
+                                q: 'Một sóng cơ có tần số f = 20 Hz truyền với tốc độ v = 4 m/s. Bước sóng λ của sóng này là:',
+                                options: ['80 m', '0,2 m', '5 m', '0,5 m'],
+                                correct: 1,
+                                explain: 'Áp dụng công thức λ = v / f = 4 / 20 = 0,2 m (20 cm).'
+                            },
+                            {
+                                id: 'pw2',
+                                q: 'Trong thí nghiệm giao thoa sóng mặt nước với 2 nguồn kết hợp cùng pha, tại điểm M có hiệu đường đi d₂ - d₁ = 2λ sẽ có:',
+                                options: ['Biên độ cực đại (bụng giao thoa)', 'Biên độ cực tiểu (đứng yên)', 'Biên độ bằng 0', 'Tần số gấp đôi nguồn'],
+                                correct: 0,
+                                explain: 'Vì d₂ - d₁ = kλ (với k = 2 nguyên) nên điểm M dao động với biên độ cực đại.'
+                            },
+                            {
+                                id: 'pw3',
+                                q: 'Trong thí nghiệm Y-âng về giao thoa ánh sáng (D = 2m, a = 1mm), ánh sáng có λ = 0,5 μm. Khoảng vân i trên màn là:',
+                                options: ['0,5 mm', '1,0 mm', '1,5 mm', '2,0 mm'],
+                                correct: 1,
+                                explain: 'Công thức khoảng vân: i = λD/a = (0,5 × 2) / 1 = 1,0 mm.'
+                            }
+                        ]
+                    },
+                    {
+                        id: 'phys_field',
+                        name: 'Lực Coulomb & Điện trường',
+                        summary: 'Định luật Coulomb về tương tác giữa hai điện tích điểm, cường độ điện trường E, công của lực điện và điện thế.',
+                        formula: '• Định luật Coulomb: F = k.|q₁q₂| / (ε.r²) với k = 9×10⁹ N.m²/C²\n• Cường độ điện trường: E = F/|q| = k.|Q|/(ε.r²)\n• Công lực điện: A_MN = q.E.d = q.U_MN',
+                        miniPractice: {
+                            q: 'Nếu tăng khoảng cách giữa hai điện tích điểm lên 2 lần thì lực tương tác tĩnh điện giữa chúng sẽ:',
+                            options: ['Giảm 2 lần', 'Giảm 4 lần', 'Tăng 2 lần', 'Tăng 4 lần'],
+                            correct: 1,
+                            explain: 'Vì F tỉ lệ nghịch với r² nên khi r tăng 2 lần thì F giảm 2² = 4 lần.'
+                        },
+                        questions: [
+                            {
+                                id: 'pf1',
+                                q: 'Hai điện tích điểm cùng dấu đặt gần nhau trong chân không sẽ:',
+                                options: ['Đẩy nhau', 'Hút nhau', 'Không tương tác', 'Triệt tiêu khối lượng của nhau'],
+                                correct: 0,
+                                explain: 'Hai điện tích cùng dấu (cùng dương hoặc cùng âm) luôn đẩy nhau, trái dấu thì hút nhau.'
+                            },
+                            {
+                                id: 'pf2',
+                                q: 'Đơn vị của cường độ điện trường E trong hệ SI là:',
+                                options: ['Culông (C)', 'Vôn trên mét (V/m)', 'Ampe (A)', 'Fara (F)'],
+                                correct: 1,
+                                explain: 'Cường độ điện trường E = U/d có đơn vị là Vôn trên mét (V/m).'
+                            },
+                            {
+                                id: 'pf3',
+                                q: 'Công của lực điện tác dụng lên một điện tích q chuyển động trong điện trường đều KHÔNG phụ thuộc vào:',
+                                options: ['Độ lớn điện tích q', 'Cường độ điện trường E', 'Hình dạng của đường đi', 'Vị trí điểm đầu và điểm cuối'],
+                                correct: 2,
+                                explain: 'Trường tĩnh điện là trường thế, nên công A = qEd chỉ phụ thuộc vị trí điểm đầu và điểm cuối, không phụ thuộc hình dạng đường đi.'
+                            }
+                        ]
+                    },
+                    {
+                        id: 'phys_cap',
+                        name: 'Tụ điện & Năng lượng điện trường',
+                        summary: 'Điện dung của tụ điện, mối liên hệ Q = C.U và công thức tính năng lượng lưu trữ trong tụ điện.',
+                        formula: '• Điện tích tụ điện: Q = C . U\n• Năng lượng tụ điện: W = (1/2)C.U² = (1/2)Q.U = Q²/(2C)',
+                        miniPractice: {
+                            q: 'Một tụ điện có điện dung C = 20 μF được tích điện ở hiệu điện thế U = 10 V. Điện tích của tụ là:',
+                            options: ['200 μC', '2 μC', '0,5 μC', '100 μC'],
+                            correct: 0,
+                            explain: 'Q = C.U = 20 μF × 10 V = 200 μC.'
+                        },
+                        questions: [
+                            {
+                                id: 'pc1',
+                                q: 'Đại lượng đặc trưng cho khả năng tích điện của tụ điện ở một hiệu điện thế nhất định được gọi là:',
+                                options: ['Cường độ điện trường', 'Điện dung của tụ điện', 'Điện trở suất', 'Suất điện động'],
+                                correct: 1,
+                                explain: 'Điện dung C = Q/U đặc trưng cho khả năng tích điện của tụ điện.'
+                            },
+                            {
+                                id: 'pc2',
+                                q: 'Đơn vị đo điện dung của tụ điện là:',
+                                options: ['Vôn (V)', 'Fara (F)', 'Ôm (Ω)', 'Oát (W)'],
+                                correct: 1,
+                                explain: 'Điện dung C có đơn vị chuẩn là Fara (F), thực tế thường dùng μF, nF, pF.'
+                            }
+                        ]
+                    },
+                    {
+                        id: 'phys_dc',
+                        name: 'Dòng điện không đổi & Định luật Ohm',
+                        summary: 'Cường độ dòng điện I = Δq/Δt, điện trở R, định luật Ohm cho toàn mạch và công suất tiêu thụ điện.',
+                        formula: '• Định luật Ohm toàn mạch: I = E / (R_N + r)\n• Hiệu điện thế mạch ngoài: U_N = I.R_N = E - I.r\n• Công suất điện: P = U.I = I².R = U²/R',
+                        miniPractice: {
+                            q: 'Cho nguồn điện có suất điện động E = 12V, điện trở trong r = 1Ω nối với điện trở ngoài R = 5Ω. Cường độ dòng điện I bằng:',
+                            options: ['2 A', '2,4 A', '12 A', '3 A'],
+                            correct: 0,
+                            explain: 'I = E / (R + r) = 12 / (5 + 1) = 2 A.'
+                        },
+                        questions: [
+                            {
+                                id: 'pd1',
+                                q: 'Trong 5 giây có một điện lượng Δq = 15 C dịch chuyển qua tiết diện thẳng của dây dẫn. Cường độ dòng điện là:',
+                                options: ['75 A', '3 A', '0,33 A', '10 A'],
+                                correct: 1,
+                                explain: 'I = Δq / Δt = 15 / 5 = 3 A.'
+                            },
+                            {
+                                id: 'pd2',
+                                q: 'Hiện tượng đoản mạch của nguồn điện xảy ra khi:',
+                                options: ['Mạch ngoài bị ngắt hoàn toàn', 'Điện trở mạch ngoài R_N ≈ 0 (nối hai cực nguồn bằng dây dẫn điện trở rất nhỏ)', 'Mắc thêm bóng đèn nối tiếp', 'Nhiệt độ dây dẫn giảm xuống'],
+                                correct: 1,
+                                explain: 'Khi R_N ≈ 0, cường độ dòng điện tăng vọt I_max = E/r gây hiện tượng đoản mạch rất nguy hiểm.'
+                            },
+                            {
+                                id: 'pd3',
+                                q: 'Một bàn là điện hoạt động ở hiệu điện thế 220V với dòng điện 5A. Công suất tiêu thụ của bàn là bằng:',
+                                options: ['44 W', '1100 W', '225 W', '550 W'],
+                                correct: 1,
+                                explain: 'Công suất P = U.I = 220 × 5 = 1100 W.'
+                            }
+                        ]
+                    }
+                ]
+            },
+
+            chem11: {
+                id: 'chem11',
+                name: 'Hóa Học 11',
+                shortName: 'Hóa Học 11',
+                icon: 'fa-flask-vial',
+                color: 'emerald',
+                gradient: 'from-emerald-600 to-teal-600',
+                description: 'Cân bằng hóa học, Nitrogen - Sulfur, Đại cương Hữu cơ, Hydrocarbon & Alcohol - Phenol',
+                topics: [
+                    {
+                        id: 'chem_eq',
+                        name: 'Cân bằng hóa học & pH dung dịch',
+                        summary: 'Hằng số cân bằng K_c, nguyên lý chuyển dịch cân bằng Le Chatelier (nhiệt độ, nồng độ, áp suất) và thuyết acid-base Brønsted-Lowry, tính pH.',
+                        formula: '• Nguyên lý Le Chatelier: Khi tác động từ bên ngoài, cân bằng chuyển dịch theo chiều làm giảm tác động đó.\n• pH = -log[H⁺] | Môi trường acid: pH < 7, trung tính: pH = 7, base: pH > 7.',
+                        miniPractice: {
+                            q: 'Dung dịch HCl 0,01M có giá trị pH bằng bao nhiêu?',
+                            options: ['pH = 1', 'pH = 2', 'pH = 12', 'pH = 7'],
+                            correct: 1,
+                            explain: '[H⁺] = 0,01 = 10⁻² M ⇒ pH = -log(10⁻²) = 2.'
+                        },
+                        questions: [
+                            {
+                                id: 'ce1',
+                                q: 'Theo thuyết Brønsted - Lowry, chất đóng vai trò là Acid trong phản ứng hóa học là chất:',
+                                options: ['Nhận proton (H⁺)', 'Cho proton (H⁺)', 'Nhường electron', 'Chỉ chứa nhóm OH⁻'],
+                                correct: 1,
+                                explain: 'Theo thuyết Brønsted - Lowry: Acid là chất cho proton (H⁺), Base là chất nhận proton (H⁺).'
+                            },
+                            {
+                                id: 'ce2',
+                                q: 'Cho cân bằng: N₂(g) + 3H₂(g) ⇌ 2NH₃(g) (Δ_r H° < 0 - tỏa nhiệt). Để cân bằng chuyển dịch theo chiều thuận tạo nhiều NH₃, ta cần:',
+                                options: ['Tăng nhiệt độ, giảm áp suất', 'Hạ nhiệt độ vừa phải và tăng áp suất chung', 'Giảm nồng độ N₂', 'Chỉ thêm chất xúc tác Fe'],
+                                correct: 1,
+                                explain: 'Phản ứng thuận tỏa nhiệt và làm giảm số mol khí (4 mol → 2 mol), nên giảm nhiệt độ và tăng áp suất giúp cân bằng chuyển dịch theo chiều thuận.'
+                            },
+                            {
+                                id: 'ce3',
+                                q: 'Yếu tố nào sau đây KHÔNG làm dịch chuyển cân bằng hóa học?',
+                                options: ['Nồng độ chất phản ứng', 'Nhiệt độ của hệ', 'Chất xúc tác', 'Áp suất (đối với hệ có chất khí)'],
+                                correct: 2,
+                                explain: 'Chất xúc tác làm tăng tốc độ phản ứng thuận và nghịch như nhau nên chỉ giúp hệ nhanh đạt cân bằng chứ không làm dịch chuyển cân bằng.'
+                            }
+                        ]
+                    },
+                    {
+                        id: 'chem_ns',
+                        name: 'Nitrogen & Sulfur (N - S)',
+                        summary: 'Tính trơ của đơn chất N₂ ở nhiệt độ thường, tính base của NH₃, tính oxi hóa mạnh của HNO₃ và H₂SO₄ đặc, hiện tượng phú dưỡng và mưa acid.',
+                        formula: '• N≡N có năng lượng liên kết rất lớn (945 kJ/mol) ⇒ N₂ rất trơ ở nhiệt độ thường.\n• Thuốc thử nhận biết ion sulfate (SO₄²⁻): dung dịch BaCl₂ hoặc Ba(NO₃)₂ tạo kết tủa trắng BaSO₄.',
+                        miniPractice: {
+                            q: 'Kim loại nào sau đây bị thụ động hóa trong HNO₃ đặc, nguội và H₂SO₄ đặc, nguội?',
+                            options: ['Cu, Ag, Zn', 'Al, Fe, Cr', 'Mg, Ca, Ba', 'Na, K, Cu'],
+                            correct: 1,
+                            explain: '3 kim loại Al, Fe, Cr bị thụ động hóa trong HNO₃ đặc nguội và H₂SO₄ đặc nguội.'
+                        },
+                        questions: [
+                            {
+                                id: 'cn1',
+                                q: 'Ở nhiệt độ thường, khí Nitrogen (N₂) khá trơ về mặt hóa học là do:',
+                                options: ['Phân tử N₂ có liên kết ba bền vững với năng lượng liên kết rất lớn', 'N₂ có khối lượng phân tử nhỏ', 'N₂ tan nhiều trong nước', 'Nitrogen có độ âm điện nhỏ nhất'],
+                                correct: 0,
+                                explain: 'Liên kết ba N≡N rất bền (E_b = 945 kJ/mol) nên ở nhiệt độ thường N₂ rất trơ.'
+                            },
+                            {
+                                id: 'cn2',
+                                q: 'Hai khí nào sau đây là nguyên nhân chính gây ra hiện tượng mưa acid?',
+                                options: ['CO₂ và CH₄', 'SO₂ và NO_x (NO, NO₂)', 'NH₃ và H₂', 'O₂ và N₂'],
+                                correct: 1,
+                                explain: 'Khí thải SO₂ và NO_x bị oxi hóa trong khí quyển tạo H₂SO₄ và HNO₃ hòa tan vào nước mưa gây mưa acid.'
+                            },
+                            {
+                                id: 'cn3',
+                                q: 'Để nhận biết dung dịch Na₂SO₄ và dung dịch NaCl, ta dùng thuốc thử nào sau đây?',
+                                options: ['Quỳ tím', 'Dung dịch BaCl₂', 'Dung dịch NaOH', 'Khí O₂'],
+                                correct: 1,
+                                explain: 'Ba²⁺ + SO₄²⁻ → BaSO₄↓ (kết tủa trắng không tan trong acid), còn NaCl không phản ứng.'
+                            }
+                        ]
+                    },
+                    {
+                        id: 'chem_org',
+                        name: 'Đại cương Hóa học hữu cơ',
+                        summary: 'Nhóm chức, phổ hồng ngoại (IR), các phương pháp tách biệt & tinh chế (chưng cất, chiết, kết tinh), công thức phân tử và đồng phân.',
+                        formula: '• Phổ IR đặc trưng: Nhóm -OH (alcohol): ~3600-3200 cm⁻¹ (tù) | Nhóm C=O: ~1740-1680 cm⁻¹ (nhọn mạnh)\n• Độ bất bão hòa k = (2C + 2 + N - H - X) / 2',
+                        miniPractice: {
+                            q: 'Việc ngâm rượu thuốc hoặc ngâm hoa quả là ứng dụng của phương pháp tách biệt nào?',
+                            options: ['Chưng cất', 'Chiết (lỏng - rắn)', 'Kết tinh', 'Sắc ký cột'],
+                            correct: 1,
+                            explain: 'Ngâm rượu thuốc dùng dung môi ethanol để hòa tan hoạt chất từ thảo mộc rắn, đó là phương pháp chiết lỏng - rắn.'
+                        },
+                        questions: [
+                            {
+                                id: 'co1',
+                                q: 'Để tách hai chất lỏng hòa tan vào nhau nhưng có nhiệt độ sôi khác nhau nhiều (ví dụ ethanol và nước), người ta dùng phương pháp:',
+                                options: ['Chưng cất', 'Kết tinh', 'Lọc qua phễu giấy', 'Chiết bằng phễu chiết'],
+                                correct: 0,
+                                explain: 'Phương pháp chưng cất dựa trên sự khác nhau về nhiệt độ sôi của các chất lỏng trộn lẫn vào nhau.'
+                            },
+                            {
+                                id: 'co2',
+                                q: 'Những hợp chất hữu cơ khác nhau nhưng có cùng công thức phân tử được gọi là các chất:',
+                                options: ['Đồng đẳng của nhau', 'Đồng phân của nhau', 'Đơn chất của nhau', 'Thù hình của nhau'],
+                                correct: 1,
+                                explain: 'Các chất khác nhau nhưng có cùng công thức phân tử (khác cấu tạo) gọi là các đồng phân.'
+                            }
+                        ]
+                    },
+                    {
+                        id: 'chem_hc',
+                        name: 'Hydrocarbon (Alkane, Alkene, Alkyne, Arene)',
+                        summary: 'Công thức chung, danh pháp IUPAC, phản ứng thế của Alkane/Arene, phản ứng cộng (quy tắc Markovnikov) của Alkene/Alkyne và phản ứng tạo kết tủa vàng của Alk-1-yne với AgNO₃/NH₃.',
+                        formula: '• Alkane: C_nH_(2n+2) (n≥1) | Alkene: C_nH_2n (n≥2) | Alkyne: C_nH_(2n-2) (n≥2) | Arene: C_nH_(2n-6) (n≥6)\n• Alk-1-yne (-C≡CH) + [Ag(NH₃)₂]OH → Kết tủa vàng nhạt.',
+                        miniPractice: {
+                            q: 'Chất nào sau đây làm mất màu dung dịch nước Bromine (Br₂) ở điều kiện thường?',
+                            options: ['Methane (CH₄)', 'Ethylene (CH₂=CH₂)', 'Benzene (C₆H₆)', 'Ethane (C₂H₆)'],
+                            correct: 1,
+                            explain: 'Ethylene có liên kết đôi C=C kém bền nên dễ tham gia phản ứng cộng làm mất màu nước Br₂.'
+                        },
+                        questions: [
+                            {
+                                id: 'ch1',
+                                q: 'Công thức chung của dãy đồng đẳng Alkene (hydrocarbon không no, mạch hở, có 1 liên kết đôi C=C) là:',
+                                options: ['C_nH_(2n+2) (n ≥ 1)', 'C_nH_2n (n ≥ 2)', 'C_nH_(2n-2) (n ≥ 2)', 'C_nH_(2n-6) (n ≥ 6)'],
+                                correct: 1,
+                                explain: 'Alkene mạch hở có 1 liên kết đôi (k = 1) nên có công thức chung là C_nH_2n (n ≥ 2).'
+                            },
+                            {
+                                id: 'ch2',
+                                q: 'Sục khí nào sau đây vào dung dịch AgNO₃ trong NH₃ dư thấy xuất hiện kết tủa màu vàng nhạt?',
+                                options: ['Ethane (C₂H₆)', 'Ethylene (C₂H₄)', 'Acetylene (CH≡CH)', 'Methane (CH₄)'],
+                                correct: 2,
+                                explain: 'Acetylene có nguyên tử H linh động gắn với carbon nối ba: CH≡CH + 2[Ag(NH₃)₂]OH → CAg≡CAg↓ (vàng) + 4NH₃ + 2H₂O.'
+                            },
+                            {
+                                id: 'ch3',
+                                q: 'Khi cho Propene (CH₂=CH-CH₃) cộng HBr theo quy tắc Markovnikov, sản phẩm chính thu được là:',
+                                options: ['CH₃-CHBr-CH₃ (2-bromopropane)', 'CH₂Br-CH₂-CH₃ (1-bromopropane)', 'CH₃-CH₂-CH₃', 'CH₂Br-CHBr-CH₃'],
+                                correct: 0,
+                                explain: 'Theo quy tắc Markovnikov, H cộng vào C bậc thấp (nhiều H hơn là CH₂), Br cộng vào C bậc cao (CH) tạo sản phẩm chính 2-bromopropane.'
+                            }
+                        ]
+                    },
+                    {
+                        id: 'chem_alc',
+                        name: 'Dẫn xuất Halogen, Alcohol & Phenol',
+                        summary: 'Phản ứng của Alcohol với Na, phản ứng hòa tan Cu(OH)₂ của polyalcohol (glycerol, ethylene glycol) tạo dung dịch xanh lam và phản ứng của Phenol với NaOH, nước Br₂.',
+                        formula: '• Polyalcohol có các nhóm -OH liền kề (C₂H₄(OH)₂, C₃H₅(OH)₃) + Cu(OH)₂ → Phức chất màu xanh lam.\n• C₆H₅OH (Phenol) + 3Br₂ → C₆H₂Br₃OH↓ (kết tủa trắng) + 3HBr',
+                        miniPractice: {
+                            q: 'Chất nào sau đây hòa tan được Cu(OH)₂ ở nhiệt độ thường tạo dung dịch màu xanh lam thẫm?',
+                            options: ['Ethanol (C₂H₅OH)', 'Glycerol (C₃H₅(OH)₃)', 'Phenol (C₆H₅OH)', 'Methanol (CH₃OH)'],
+                            correct: 1,
+                            explain: 'Glycerol là polyalcohol có các nhóm -OH kề nhau nên hòa tan Cu(OH)₂ tạo phức đồng(II) glycerate màu xanh lam.'
+                        },
+                        questions: [
+                            {
+                                id: 'ca1',
+                                q: 'Khác với Ethanol (C₂H₅OH), Phenol (C₆H₅OH) có khả năng phản ứng được với dung dịch nào sau đây?',
+                                options: ['Dung dịch NaOH', 'Kim loại Na', 'Khí H₂', 'Dung dịch NaCl'],
+                                correct: 0,
+                                explain: 'Do ảnh hưởng của vòng benzene, nhóm -OH của phenol có tính acid yếu nên phản ứng được với dung dịch NaOH: C₆H₅OH + NaOH → C₆H₅ONa + H₂O.'
+                            },
+                            {
+                                id: 'ca2',
+                                q: 'Nhỏ nước Bromine (Br₂) vào ống nghiệm đựng dung dịch Phenol, hiện tượng quan sát được là:',
+                                options: ['Xuất hiện kết tủa trắng 2,4,6-tribromophenol', 'Có khí không màu bay ra', 'Dung dịch chuyển sang màu tím', 'Không có hiện tượng gì'],
+                                correct: 0,
+                                explain: 'Phenol phản ứng thế rất dễ với nước Br₂ tạo kết tủa trắng 2,4,6-tribromophenol.'
+                            },
+                            {
+                                id: 'ca3',
+                                q: 'Oxi hóa không hoàn toàn alcohol bậc I (R-CH₂OH) bằng CuO đun nóng thu được sản phẩm hữu cơ thuộc loại:',
+                                options: ['Aldehyde (R-CHO)', 'Ketone (R-CO-R\')', 'Alkane', 'Ester'],
+                                correct: 0,
+                                explain: 'R-CH₂OH + CuO (t°) → R-CHO (Aldehyde) + Cu + H₂O.'
+                            }
+                        ]
+                    }
+                ]
+            },
+
+            eng11: {
+                id: 'eng11',
+                name: 'Tiếng Anh 11 (Global Success)',
+                shortName: 'Tiếng Anh 11',
+                icon: 'fa-language',
+                color: 'rose',
+                gradient: 'from-rose-600 to-pink-600',
+                description: 'Past Simple vs Present Perfect, Modal Verbs, Gerunds, Participle Clauses, Cleft Sentences & Vocabulary',
+                topics: [
+                    {
+                        id: 'eng_tense',
+                        name: 'Past Simple vs. Present Perfect (Thì QKĐ & HTHT)',
+                        summary: 'Phân biệt hành động đã chấm dứt hoàn toàn ở quá khứ có mốc thời gian cụ thể (Past Simple) và hành động kéo dài đến hiện tại hoặc vừa xảy ra (Present Perfect).',
+                        formula: '• Past Simple: S + V2/ed (yesterday, last week, in 2020, ... ago)\n• Present Perfect: S + have/has + V3/ed (since + mốc TG, for + khoảng TG, recently, so far, already, yet)',
+                        miniPractice: {
+                            q: 'We _______ each other since we moved to Ho Chi Minh City in 2022.',
+                            options: ['knew', 'have known', 'know', 'were knowing'],
+                            correct: 1,
+                            explain: 'Cấu trúc: Present Perfect (have known) + since + Past Simple (moved).'
+                        },
+                        questions: [
+                            {
+                                id: 'et1',
+                                q: 'My grandparents _______ exercises every morning for over 20 years to stay healthy.',
+                                options: ['did', 'have done', 'are doing', 'had done'],
+                                correct: 1,
+                                explain: 'Có dấu hiệu "for over 20 years" chỉ hành động kéo dài từ quá khứ đến hiện tại nên dùng Present Perfect (have done).'
+                            },
+                            {
+                                id: 'et2',
+                                q: 'She _______ taking fast food three months ago and now she feels much more energetic.',
+                                options: ['has stopped', 'stopped', 'stops', 'was stopping'],
+                                correct: 1,
+                                explain: 'Có cụm thời gian xác định trong quá khứ "three months ago" nên dùng thì Quá khứ đơn (stopped).'
+                            },
+                            {
+                                id: 'et3',
+                                q: 'This is the first time Minh _______ part in an ASEAN youth volunteer program.',
+                                options: ['took', 'takes', 'has taken', 'is taking'],
+                                correct: 2,
+                                explain: 'Sau cấu trúc "This is the first/second time + S + have/has + V3/ed" ta luôn dùng thì Hiện tại hoàn thành.'
+                            }
+                        ]
+                    },
+                    {
+                        id: 'eng_modal',
+                        name: 'Modal Verbs & Linking Verbs (Unit 2 & 3)',
+                        summary: 'Cách phân biệt must (nghĩa vụ chủ quan) với have to (quy định khách quan), mustn\'t (cấm đoán) với don\'t have to (không cần thiết), và động từ nối (look, seem, taste, feel + Adj).',
+                        formula: '• mustn\'t + V (cấm không được làm) ≠ don\'t/doesn\'t have to + V (không bắt buộc làm)\n• Linking verbs: feel / look / sound / taste / smell / seem / become + ADJECTIVE (Tính từ)',
+                        miniPractice: {
+                            q: 'The soup my mother cooked smells _______! Everyone wants to try it.',
+                            options: ['wonderfully', 'wonderful', 'wonder', 'wondering'],
+                            correct: 1,
+                            explain: 'Sau linking verb "smell" (có mùi...) dùng tính từ (wonderful), không dùng trạng từ.'
+                        },
+                        questions: [
+                            {
+                                id: 'em1',
+                                q: 'Students _______ use smartphones during the final examination. It is strictly against the school rules.',
+                                options: ['don\'t have to', 'mustn\'t', 'ought to', 'needn\'t'],
+                                correct: 1,
+                                explain: 'Việc dùng điện thoại trong phòng thi là bị cấm theo nội quy nên dùng "mustn\'t" (không được phép).'
+                            },
+                            {
+                                id: 'em2',
+                                q: 'Tomorrow is Sunday, so I _______ get up early to catch the school bus.',
+                                options: ['mustn\'t', 'shouldn\'t', 'don\'t have to', 'can\'t'],
+                                correct: 2,
+                                explain: 'Chủ nhật được nghỉ nên "không cần thiết phải" dậy sớm: dùng "don\'t have to".'
+                            },
+                            {
+                                id: 'em3',
+                                q: 'Living in a smart city with green roofs and automated traffic sounds very _______ to young people.',
+                                options: ['exciting', 'excitedly', 'excite', 'excitement'],
+                                correct: 0,
+                                explain: 'Sau linking verb "sounds" cần một tính từ mô tả tính chất sự vật ⇒ dùng "exciting".'
+                            }
+                        ]
+                    },
+                    {
+                        id: 'eng_part',
+                        name: 'Gerunds & Participle Clauses (Danh động từ & Mệnh đề phân từ)',
+                        summary: 'Sử dụng V-ing làm chủ ngữ/tân ngữ và rút gọn mệnh đề cùng chủ ngữ bằng Present Participle (V-ing - chủ động) hoặc Past Participle (V3/ed - bị động).',
+                        formula: '• Chủ động: V-ing ..., S + V (VD: Burning fossil fuels, humans release CO₂)\n• Bị động: V3/ed ..., S + V (VD: Built in 2025, the smart bridge reduces traffic jams)',
+                        miniPractice: {
+                            q: '_______ extensively for fuel, coal and oil release huge amounts of greenhouse gases.',
+                            options: ['Burning', 'Burnt', 'To burn', 'Having burnt'],
+                            correct: 1,
+                            explain: 'Chủ ngữ là "coal and oil" (than và dầu) chịu tác động bị đốt (bị động) nên rút gọn bằng Past Participle: Burnt.'
+                        },
+                        questions: [
+                            {
+                                id: 'ep1',
+                                q: '_______ trees in urban areas helps reduce the city temperature and absorb carbon dioxide.',
+                                options: ['Plant', 'Planting', 'Planted', 'To planted'],
+                                correct: 1,
+                                explain: 'Động từ đứng đầu câu làm chủ ngữ (Subject) được chia ở dạng Danh động từ (Gerund: Planting).'
+                            },
+                            {
+                                id: 'ep2',
+                                q: '_______ by rising sea levels, many coastal communities are building stronger sea walls.',
+                                options: ['Threatening', 'Threatened', 'To threaten', 'Having threatened'],
+                                correct: 1,
+                                explain: 'Mệnh đề phân từ bị động: "Các cộng đồng ven biển bị đe dọa bởi nước biển dâng" ⇒ dùng V3/ed (Threatened).'
+                            },
+                            {
+                                id: 'ep3',
+                                q: 'Do you mind _______ me prepare the presentation about the ASEAN Youth Programme?',
+                                options: ['help', 'to help', 'helping', 'helped'],
+                                correct: 2,
+                                explain: 'Cấu trúc "Do you mind + V-ing...?" (Bạn có phiền làm gì không?).'
+                            }
+                        ]
+                    },
+                    {
+                        id: 'eng_cleft',
+                        name: 'Cleft Sentences (Câu chẻ nhấn mạnh)',
+                        summary: 'Cấu trúc câu chẻ dùng để nhấn mạnh chủ ngữ, tân ngữ hoặc trạng ngữ chỉ thời gian/nơi chốn trong câu.',
+                        formula: '• It is / was + [Thành phần nhấn mạnh] + that / who + [Phần còn lại của câu]\n(Lưu ý: Chỉ dùng "who" khi nhấn mạnh người, còn "that" dùng được cho mọi trường hợp).',
+                        miniPractice: {
+                            q: 'It was in Ha Noi _______ Vietnam hosted the 31st SEA Games successfully.',
+                            options: ['who', 'where', 'that', 'which'],
+                            correct: 2,
+                            explain: 'Trong cấu trúc câu chẻ (Cleft sentence): It is/was + trạng ngữ nơi chốn + THAT + S + V (không dùng where).'
+                        },
+                        questions: [
+                            {
+                                id: 'ec1',
+                                q: 'It is self-study skills _______ help high school students become more independent learners.',
+                                options: ['who', 'that', 'whom', 'where'],
+                                correct: 1,
+                                explain: 'Cấu trúc câu chẻ nhấn mạnh chủ ngữ chỉ vật "self-study skills": It is + ... + that + V.'
+                            },
+                            {
+                                id: 'ec2',
+                                q: 'It was my English teacher _______ encouraged me to apply for the scholarship in Singapore.',
+                                options: ['which', 'who', 'where', 'when'],
+                                correct: 1,
+                                explain: 'Nhấn mạnh chủ ngữ chỉ người "my English teacher" trong câu chẻ nên dùng "who" (hoặc "that").'
+                            }
+                        ]
+                    },
+                    {
+                        id: 'eng_vocab',
+                        name: 'Từ vựng Trọng tâm (Generation Gap, Global Warming, Smart Cities)',
+                        summary: 'Hệ thống từ vựng và cụm từ cố định (collocations) thuộc các chủ đề lớn trong sách Tiếng Anh 11.',
+                        formula: '• carbon footprint (dấu chân carbon) | greenhouse effect (hiệu ứng nhà kính)\n• generation gap (khoảng cách thế hệ) | nuclear family (gia đình hạt nhân) vs extended family (gia đình đa thế hệ)',
+                        miniPractice: {
+                            q: 'A _______ family consists of only parents and their children living under one roof.',
+                            options: ['extended', 'nuclear', 'single', 'traditional'],
+                            correct: 1,
+                            explain: 'Nuclear family là gia đình hạt nhân (gồm 2 thế hệ: bố mẹ và con cái).'
+                        },
+                        questions: [
+                            {
+                                id: 'ev1',
+                                q: 'Using public transport instead of private cars is an effective way to reduce our carbon _______.',
+                                options: ['footprint', 'footstep', 'shadow', 'heating'],
+                                correct: 0,
+                                explain: 'Cụm từ cố định "carbon footprint" (lượng khí thải carbon do con người tạo ra).'
+                            },
+                            {
+                                id: 'ev2',
+                                q: 'Living in an _______ family with grandparents, parents, aunts and uncles helps children learn traditional values.',
+                                options: ['nuclear', 'extended', 'crowded', 'isolated'],
+                                correct: 1,
+                                explain: 'Extended family là đại gia đình / gia đình nhiều thế hệ chung sống.'
+                            },
+                            {
+                                id: 'ev3',
+                                q: 'In Cities of the Future, AI sensors will monitor traffic flow to prevent _______ during rush hours.',
+                                options: ['congestion', 'biodiversity', 'longevity', 'curfew'],
+                                correct: 0,
+                                explain: 'Traffic congestion = sự ùn tắc giao thông.'
+                            }
+                        ]
+                    }
+                ]
+            }
+        };
+
+        // ============================================================================
+        // 2. LOGIC HỆ THỐNG HỌC TẬP THÍCH ỨNG & LẶP LẠI NGẮT QUÃNG
+        // ============================================================================
+        class SmartGrade11App {
+            constructor() {
+                this.state = {
+                    studentName: 'Nguyễn Minh Khôi',
+                    studentClass: '11A1 - Khối KHTN (Toán - Lý - Hóa - Anh)',
+                    currentSubjectId: 'math11',
+                    activeView: 'dashboard', // 'dashboard' | 'quiz' | 'quiz_result'
+                    activeQuiz: null,
+                    lastQuizAnalysis: null,
+                    subjectsProgress: {}
+                };
+
+                this.db = null;
+                this.auth = null;
+                this.userId = null;
+
+                this.initDefaultProgress();
+                this.initFirebase();
+                this.bindEvents();
+            }
+
+            // Khởi tạo dữ liệu mặc định cho 4 môn
+            initDefaultProgress() {
+                Object.keys(CURRICULUM_DATA).forEach(subId => {
+                    const sub = CURRICULUM_DATA[subId];
+                    const topicMastery = {};
+                    sub.topics.forEach(t => {
+                        topicMastery[t.id] = {
+                            score: null,         // null = chưa test, 0..100
+                            status: 'untested',  // 'untested' | 'weak' | 'mastered' | 'forgotten'
+                            lastTestedWeek: 0
+                        };
+                    });
+
+                    this.state.subjectsProgress[subId] = {
+                        hasTakenDiagnostic: false,
+                        currentWeek: 1,
+                        topicMastery,
+                        weeklyPlan: [],
+                        testHistory: []
+                    };
+                });
+            }
+
+            // Kết nối Firebase Auth & Firestore tuân thủ nghiêm ngặt quy tắc bảo mật
+            async initFirebase() {
+                try {
+                    if (typeof __firebase_config !== 'undefined' && __firebase_config) {
+                        const firebaseConfig = JSON.parse(__firebase_config);
+                        const app = initializeApp(firebaseConfig);
+                        this.db = getFirestore(app);
+                        this.auth = getAuth(app);
+
+                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                            await signInWithCustomToken(this.auth, __initial_auth_token);
+                        } else {
+                            await signInAnonymously(this.auth);
+                        }
+
+                        onAuthStateChanged(this.auth, async (user) => {
+                            if (user) {
+                                this.userId = user.uid;
+                                await this.loadStateFromCloud();
+                            }
+                        });
+                    }
+                } catch (err) {
+                    console.warn("Chạy ở chế độ In-Memory (Offline):", err);
+                }
+            }
+
+            async saveStateToCloud() {
+                if (!this.db || !this.userId) return;
+                try {
+                    const appId = typeof __app_id !== 'undefined' ? __app_id : 'smartgrade-11-app';
+                    const docRef = doc(this.db, 'artifacts', appId, 'users', this.userId, 'learningData', 'profile');
+                    await setDoc(docRef, {
+                        studentName: this.state.studentName,
+                        studentClass: this.state.studentClass,
+                        currentSubjectId: this.state.currentSubjectId,
+                        subjectsProgressJson: JSON.stringify(this.state.subjectsProgress),
+                        updatedAt: Date.now()
+                    });
+                    const badge = document.getElementById('cloud-status-badge');
+                    if (badge) badge.classList.remove('hidden');
+                } catch (e) {
+                    console.warn("Không thể lưu Cloud:", e);
+                }
+            }
+
+            async loadStateFromCloud() {
+                if (!this.db || !this.userId) return;
+                try {
+                    const appId = typeof __app_id !== 'undefined' ? __app_id : 'smartgrade-11-app';
+                    const docRef = doc(this.db, 'artifacts', appId, 'users', this.userId, 'learningData', 'profile');
+                    const snap = await getDoc(docRef);
+                    if (snap.exists()) {
+                        const data = snap.data();
+                        if (data.studentName) this.state.studentName = data.studentName;
+                        if (data.studentClass) this.state.studentClass = data.studentClass;
+                        if (data.subjectsProgressJson) {
+                            const parsed = JSON.parse(data.subjectsProgressJson);
+                            this.state.subjectsProgress = { ...this.state.subjectsProgress, ...parsed };
+                        }
+                        this.updateHeaderStudentInfo();
+                        this.renderAll();
+                    }
+                } catch (e) {
+                    console.warn("Không thể tải dữ liệu Cloud:", e);
+                }
+            }
+
+            bindEvents() {
+                const loginForm = document.getElementById('login-form');
+                if (loginForm) {
+                    loginForm.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        const name = document.getElementById('student-name-input').value.trim() || 'Học Sinh 11';
+                        const cls = document.getElementById('student-class-input').value;
+                        this.state.studentName = name;
+                        this.state.studentClass = cls;
+                        document.getElementById('login-screen').classList.add('hidden');
+                        this.updateHeaderStudentInfo();
+                        this.renderAll();
+                        this.saveStateToCloud();
+                        this.showToast(`Chào mừng ${name}! Hãy chọn môn học để kiểm tra đầu vào hoặc xem liệu trình.`, 'indigo');
+                    });
+                }
+
+                const quickDemoBtn = document.getElementById('quick-demo-btn');
+                if (quickDemoBtn) {
+                    quickDemoBtn.addEventListener('click', () => {
+                        const name = document.getElementById('student-name-input').value.trim() || 'Nguyễn Minh Khôi';
+                        const cls = document.getElementById('student-class-input').value;
+                        this.state.studentName = name;
+                        this.state.studentClass = cls;
+                        document.getElementById('login-screen').classList.add('hidden');
+                        this.updateHeaderStudentInfo();
+                        this.loadDemoScenario();
+                    });
+                }
+            }
+
+            updateHeaderStudentInfo() {
+                document.getElementById('header-student-name').textContent = this.state.studentName;
+                document.getElementById('header-student-class').textContent = this.state.studentClass;
+                const initial = this.state.studentName.trim().split(' ').pop().charAt(0).toUpperCase() || 'H';
+                document.getElementById('header-avatar').textContent = initial;
+            }
+
+            logout() {
+                document.getElementById('login-screen').classList.remove('hidden');
+            }
+
+            openGuideModal() {
+                document.getElementById('guide-modal').classList.remove('hidden');
+            }
+
+            closeGuideModal() {
+                document.getElementById('guide-modal').classList.add('hidden');
+            }
+
+            showToast(message, type = 'indigo') {
+                const container = document.getElementById('toast-container');
+                const colors = {
+                    indigo: 'bg-indigo-950 text-white border-indigo-500',
+                    emerald: 'bg-emerald-950 text-white border-emerald-500',
+                    amber: 'bg-amber-950 text-white border-amber-500',
+                    purple: 'bg-purple-950 text-white border-purple-400',
+                    rose: 'bg-rose-950 text-white border-rose-500'
+                };
+                const toast = document.createElement('div');
+                toast.className = `pointer-events-auto px-4 py-3 rounded-2xl shadow-xl border-l-4 ${colors[type] || colors.indigo} text-xs sm:text-sm font-medium flex items-center justify-between gap-3 transition-all duration-300`;
+                toast.innerHTML = `
+                    <div class="flex items-center gap-2.5">
+                        <i class="fa-solid fa-bell text-amber-300"></i>
+                        <span>${message}</span>
+                    </div>
+                `;
+                container.appendChild(toast);
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    setTimeout(() => toast.remove(), 300);
+                }, 4200);
+            }
+
+            switchSubject(subjectId) {
+                this.state.currentSubjectId = subjectId;
+                this.state.activeView = 'dashboard';
+                this.state.activeQuiz = null;
+                this.renderAll();
+            }
+
+            // ============================================================================
+            // 3. THUẬT TOÁN SINH LIỆU TRÌNH 7 NGÀY (ADAPTIVE 7-DAY SCHEDULE GENERATOR)
+            // ============================================================================
+            generate7DayStudyPlan(subjectId) {
+                const subject = CURRICULUM_DATA[subjectId];
+                const prog = this.state.subjectsProgress[subjectId];
+                const mastery = prog.topicMastery;
+
+                // Phân loại các chuyên đề theo mức độ ưu tiên
+                const forgottenTopics = []; // Ưu tiên 1: Kiến thức cũ bị quên khi test lại
+                const weakTopics = [];      // Ưu tiên 2: Kiến thức còn thiếu / chưa vững (<70%)
+                const masteredTopics = [];  // Ưu tiên 3: Kiến thức đã vững (≥70%)
+
+                subject.topics.forEach(t => {
+                    const m = mastery[t.id];
+                    if (m.status === 'forgotten') {
+                        forgottenTopics.push(t);
+                    } else if (m.status === 'weak' || m.status === 'untested' || (m.score !== null && m.score < 70)) {
+                        weakTopics.push(t);
+                    } else {
+                        masteredTopics.push(t);
+                    }
+                });
+
+                // Danh sách hàng đợi học tập cho 5 ngày trong tuần (Thứ 2 -> Thứ 6)
+                const priorityQueue = [];
+
+                // Đưa tất cả chuyên đề cũ bị quên vào đầu tuần
+                forgottenTopics.forEach(t => {
+                    priorityQueue.push({
+                        topic: t,
+                        reasonTag: 'forgotten_recovery',
+                        reasonLabel: 'Khôi phục kiến thức cũ bị quên',
+                        badgeClass: 'bg-purple-100 text-purple-800 border-purple-300'
+                    });
+                });
+
+                // Đưa các chuyên đề bị hổng (<70%) vào tiếp theo
+                weakTopics.forEach(t => {
+                    priorityQueue.push({
+                        topic: t,
+                        reasonTag: 'fill_gap',
+                        reasonLabel: 'Bổ sung kiến thức còn thiếu',
+                        badgeClass: 'bg-rose-100 text-rose-800 border-rose-300'
+                    });
+                });
+
+                // Nếu tổng số chuyên đề yếu + quên < 5 ngày, lấp đầy các ngày còn lại bằng:
+                // - Luyện sâu thêm chuyên đề yếu/quên hoặc Ôn tập nâng cao chuyên đề đã vững
+                let idx = 0;
+                while (priorityQueue.length < 5) {
+                    if (forgottenTopics.length > 0 || weakTopics.length > 0) {
+                        const pool = [...forgottenTopics, ...weakTopics];
+                        const t = pool[idx % pool.length];
+                        priorityQueue.push({
+                            topic: t,
+                            reasonTag: 'deep_practice',
+                            reasonLabel: 'Luyện tập củng cố chuyên sâu',
+                            badgeClass: 'bg-amber-100 text-amber-800 border-amber-300'
+                        });
+                    } else {
+                        const t = masteredTopics[idx % masteredTopics.length];
+                        priorityQueue.push({
+                            topic: t,
+                            reasonTag: 'advanced_mastery',
+                            reasonLabel: 'Nâng cao & Duy trì phong độ',
+                            badgeClass: 'bg-emerald-100 text-emerald-800 border-emerald-300'
+                        });
+                    }
+                    idx++;
+                }
+
+                const dayNames = ['Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy', 'Chủ Nhật'];
+                const plan = [];
+
+                // Ngày 1 -> Ngày 5: Học bổ sung và ôn luyện chuyên đề
+                for (let i = 0; i < 5; i++) {
+                    const item = priorityQueue[i];
+                    plan.push({
+                        dayNumber: i + 1,
+                        dayName: dayNames[i],
+                        type: 'study',
+                        topicId: item.topic.id,
+                        topicName: item.topic.name,
+                        reasonTag: item.reasonTag,
+                        reasonLabel: item.reasonLabel,
+                        badgeClass: item.badgeClass,
+                        completed: false
+                    });
+                }
+
+                // Ngày 6 (Thứ Bảy): Hệ thống hóa toàn bộ sơ đồ tư duy tuần + Nhắc lại kiến thức cũ
+                const oldTopicsNames = masteredTopics.map(t => t.name).join(', ') || 'Các chuyên đề đã học';
+                plan.push({
+                    dayNumber: 6,
+                    dayName: dayNames[5],
+                    type: 'review_prep',
+                    topicId: priorityQueue[0].topic.id,
+                    topicName: 'Tổng hợp Công thức Tuần & Rà soát Kiến thức cũ',
+                    reasonTag: 'spaced_review',
+                    reasonLabel: 'Chuẩn bị kiểm tra định kỳ',
+                    badgeClass: 'bg-indigo-100 text-indigo-800 border-indigo-300',
+                    oldTopicsNote: oldTopicsNames,
+                    completed: false
+                });
+
+                // Ngày 7 (Chủ Nhật): Bài Test Tổng Kết Tuần (Kiểm tra bài mới học + Kiểm tra lại bài cũ)
+                plan.push({
+                    dayNumber: 7,
+                    dayName: dayNames[6],
+                    type: 'weekly_test',
+                    topicId: null,
+                    topicName: `Bài Kiểm Tra Tổng Kết Tuần ${prog.currentWeek} & Chống Quên Kiến Thức Cũ`,
+                    reasonTag: 'weekly_exam',
+                    reasonLabel: 'Đánh giá tuần & Lập lộ trình tuần kế tiếp',
+                    badgeClass: 'bg-amber-100 text-amber-900 border-amber-300',
+                    completed: false
+                });
+
+                prog.weeklyPlan = plan;
+            }
+
+            // ============================================================================
+            // 4. HỆ THỐNG BÀI KIỂM TRA ĐẦU VÀO & BÀI KIỂM TRA CUỐI TUẦN
+            // ============================================================================
+
+            // Bắt đầu Bài Test Đầu Vào (Diagnostic Test)
+            startDiagnosticTest() {
+                const subId = this.state.currentSubjectId;
+                const subject = CURRICULUM_DATA[subId];
+                const questions = [];
+
+                // Lấy mỗi chuyên đề 2 câu hỏi để phân loại chuẩn xác 5 chuyên đề (tổng 10 câu)
+                subject.topics.forEach(topic => {
+                    topic.questions.slice(0, 2).forEach(q => {
+                        questions.push({
+                            ...q,
+                            topicId: topic.id,
+                            topicName: topic.name,
+                            questionCategory: 'diagnostic' // Phân loại đầu vào
+                        });
+                    });
+                });
+
+                this.state.activeQuiz = {
+                    mode: 'diagnostic',
+                    title: `Bài Kiểm Tra Đầu Vào - Môn ${subject.name}`,
+                    subtitle: 'Hệ thống sẽ chấm điểm riêng từng chuyên đề để lập Liệu trình 7 ngày phù hợp nhất với bạn.',
+                    questions,
+                    userAnswers: new Array(questions.length).fill(null)
+                };
+                this.state.activeView = 'quiz';
+                this.renderAll();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            // Bắt đầu Bài Test Cuối Tuần (Weekly Review + Spaced Repetition Old Knowledge Check)
+            startWeeklyReviewTest() {
+                const subId = this.state.currentSubjectId;
+                const subject = CURRICULUM_DATA[subId];
+                const prog = this.state.subjectsProgress[subId];
+
+                if (!prog.hasTakenDiagnostic) {
+                    this.showToast('Hãy làm Bài Test Đầu Vào trước để có liệu trình tuần!', 'amber');
+                    this.startDiagnosticTest();
+                    return;
+                }
+
+                // Xác định các chuyên đề vừa được học trong tuần này
+                const studiedTopicIds = new Set(
+                    prog.weeklyPlan
+                        .filter(d => d.type === 'study' && d.topicId)
+                        .map(d => d.topicId)
+                );
+
+                const questions = [];
+
+                subject.topics.forEach(topic => {
+                    const m = prog.topicMastery[topic.id];
+                    const isStudiedThisWeek = studiedTopicIds.has(topic.id);
+                    const wasPreviouslyMastered = (m.status === 'mastered');
+
+                    if (isStudiedThisWeek) {
+                        // Lấy 2 câu hỏi kiểm tra xem kiến thức bổ sung trong tuần đã nắm được chưa
+                        topic.questions.slice(0, 2).forEach(q => {
+                            questions.push({
+                                ...q,
+                                topicId: topic.id,
+                                topicName: topic.name,
+                                questionCategory: m.status === 'forgotten' ? 'relearn_forgotten' : 'weekly_new'
+                            });
+                        });
+                    } else if (wasPreviouslyMastered) {
+                        // SPACED REPETITION: Lấy câu hỏi để kiểm tra lại kiến thức cũ xem có bị quên không!
+                        const oldQ = topic.questions[topic.questions.length - 1];
+                        questions.push({
+                            ...oldQ,
+                            topicId: topic.id,
+                            topicName: topic.name,
+                            questionCategory: 'old_retention_check'
+                        });
+                    } else {
+                        // Chuyên đề khác chưa vững
+                        const q = topic.questions[0];
+                        questions.push({
+                            ...q,
+                            topicId: topic.id,
+                            topicName: topic.name,
+                            questionCategory: 'weekly_new'
+                        });
+                    }
+                });
+
+                this.state.activeQuiz = {
+                    mode: 'weekly',
+                    title: `Bài Kiểm Tra Tổng Kết Tuần ${prog.currentWeek} - ${subject.name}`,
+                    subtitle: 'Bao gồm: Câu hỏi đánh giá kiến thức vừa bổ sung trong tuần + Câu hỏi kiểm tra lại kiến thức cũ (Spaced Repetition).',
+                    questions,
+                    userAnswers: new Array(questions.length).fill(null)
+                };
+                this.state.activeView = 'quiz';
+                this.renderAll();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            selectQuizOption(qIndex, optIndex) {
+                if (!this.state.activeQuiz) return;
+                this.state.activeQuiz.userAnswers[qIndex] = optIndex;
+                this.renderWorkspace();
+            }
+
+            // Tự động điền thông minh để người dùng muốn nộp nhanh bài test
+            autoFillCurrentQuiz(mode = 'mixed') {
+                if (!this.state.activeQuiz) return;
+                this.state.activeQuiz.questions.forEach((q, idx) => {
+                    if (mode === 'all_correct') {
+                        this.state.activeQuiz.userAnswers[idx] = q.correct;
+                    } else {
+                        // Giả lập học tốt bài mới nhưng vô tình làm sai 1 câu kiến thức cũ để thấy rõ tính năng
+                        if (q.questionCategory === 'old_retention_check') {
+                            this.state.activeQuiz.userAnswers[idx] = (q.correct + 1) % q.options.length;
+                        } else {
+                            this.state.activeQuiz.userAnswers[idx] = idx % 3 === 0 ? (q.correct + 1) % q.options.length : q.correct;
+                        }
+                    }
+                });
+                this.renderWorkspace();
+                this.showToast('Đã điền nhanh đáp án mẫu! Bạn có thể bấm Nộp Bài ngay bên dưới.', 'indigo');
+            }
+
+            // Chấm bài & Phân tích Lỗ hổng + Kiến thức cũ bị quên
+            submitActiveQuiz() {
+                const quiz = this.state.activeQuiz;
+                if (!quiz) return;
+
+                const unanswered = quiz.userAnswers.filter(a => a === null).length;
+                if (unanswered > 0) {
+                    this.showToast(`Bạn còn ${unanswered} câu chưa chọn đáp án. Hoặc bấm nút "Điền nhanh đáp án mẫu" ở trên!`, 'rose');
+                    return;
+                }
+
+                const subId = this.state.currentSubjectId;
+                const subject = CURRICULUM_DATA[subId];
+                const prog = this.state.subjectsProgress[subId];
+
+                // Thống kê điểm theo từng chuyên đề trong bài test này
+                const topicStats = {};
+                let totalCorrect = 0;
+
+                quiz.questions.forEach((q, idx) => {
+                    const isCorrect = quiz.userAnswers[idx] === q.correct;
+                    if (isCorrect) totalCorrect++;
+
+                    if (!topicStats[q.topicId]) {
+                        topicStats[q.topicId] = {
+                            topicId: q.topicId,
+                            topicName: q.topicName,
+                            correct: 0,
+                            total: 0,
+                            questionCategory: q.questionCategory
+                        };
+                    }
+                    topicStats[q.topicId].total++;
+                    if (isCorrect) topicStats[q.topicId].correct++;
+                });
+
+                const newlyMastered = [];
+                const stillWeak = [];
+                const newlyForgottenOld = [];
+                const retainedOld = [];
+
+                Object.values(topicStats).forEach(st => {
+                    const pct = Math.round((st.correct / st.total) * 100);
+                    const prevMastery = prog.topicMastery[st.topicId];
+                    const wasMasteredBefore = prevMastery.status === 'mastered';
+
+                    if (quiz.mode === 'diagnostic') {
+                        // Test đầu vào
+                        prevMastery.score = pct;
+                        prevMastery.lastTestedWeek = prog.currentWeek;
+                        if (pct >= 70) {
+                            prevMastery.status = 'mastered';
+                            newlyMastered.push({ ...st, pct });
+                        } else {
+                            prevMastery.status = 'weak';
+                            stillWeak.push({ ...st, pct });
+                        }
+                    } else {
+                        // Test cuối tuần (Weekly Review + Spaced Repetition)
+                        prevMastery.score = pct;
+                        prevMastery.lastTestedWeek = prog.currentWeek;
+
+                        if (st.questionCategory === 'old_retention_check' || wasMasteredBefore) {
+                            // Nếu đây là chuyên đề cũ đã từng nắm vững ở tuần trước
+                            if (pct < 70) {
+                                prevMastery.status = 'forgotten'; // Đánh dấu CŨ BỊ QUÊN!
+                                newlyForgottenOld.push({ ...st, pct });
+                            } else {
+                                prevMastery.status = 'mastered';
+                                retainedOld.push({ ...st, pct });
+                            }
+                        } else {
+                            // Đây là chuyên đề học bổ sung trong tuần
+                            if (pct >= 70) {
+                                prevMastery.status = 'mastered';
+                                newlyMastered.push({ ...st, pct });
+                            } else {
+                                prevMastery.status = 'weak';
+                                stillWeak.push({ ...st, pct });
+                            }
+                        }
+                    }
+                });
+
+                const overallScore = Math.round((totalCorrect / quiz.questions.length) * 100);
+
+                // Lưu vào lịch sử kiểm tra
+                prog.testHistory.unshift({
+                    id: 'test_' + Date.now(),
+                    week: prog.currentWeek,
+                    mode: quiz.mode,
+                    title: quiz.mode === 'diagnostic' ? 'Test Đầu Vào' : `Test Tổng Kết Tuần ${prog.currentWeek}`,
+                    score: overallScore,
+                    correctCount: totalCorrect,
+                    totalCount: quiz.questions.length,
+                    forgottenCount: newlyForgottenOld.length,
+                    weakCount: stillWeak.length,
+                    timestamp: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) + ' hôm nay'
+                });
+
+                if (quiz.mode === 'diagnostic') {
+                    prog.hasTakenDiagnostic = true;
+                    prog.currentWeek = 1;
+                    this.generate7DayStudyPlan(subId);
+                } else {
+                    // Đánh dấu ngày 7 hoàn thành
+                    const day7 = prog.weeklyPlan.find(d => d.dayNumber === 7);
+                    if (day7) day7.completed = true;
+                }
+
+                this.state.lastQuizAnalysis = {
+                    mode: quiz.mode,
+                    weekCompleted: prog.currentWeek,
+                    overallScore,
+                    totalCorrect,
+                    totalQuestions: quiz.questions.length,
+                    newlyMastered,
+                    stillWeak,
+                    newlyForgottenOld,
+                    retainedOld,
+                    questions: quiz.questions,
+                    userAnswers: quiz.userAnswers
+                };
+
+                this.state.activeView = 'quiz_result';
+                this.saveStateToCloud();
+                this.renderAll();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            // Khởi tạo Liệu trình Tuần tiếp theo (Tuần N + 1) sau khi làm Test Cuối Tuần
+            generateNextWeekPlanFromResult() {
+                const subId = this.state.currentSubjectId;
+                const prog = this.state.subjectsProgress[subId];
+                prog.currentWeek += 1;
+                this.generate7DayStudyPlan(subId);
+                this.state.activeView = 'dashboard';
+                this.saveStateToCloud();
+                this.renderAll();
+                this.showToast(`Đã tạo Liệu trình Tuần ${prog.currentWeek}! Các chuyên đề còn thiếu và kiến thức cũ bị quên đã được đưa vào lịch học.`, 'purple');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            // ============================================================================
+            // 5. CÁC TÍNH NĂNG HỖ TRỢ HỌC TẬP HÀNG NGÀY & GIẢ LẬP NHANH
+            // ============================================================================
+            toggleDayComplete(dayNumber) {
+                const subId = this.state.currentSubjectId;
+                const prog = this.state.subjectsProgress[subId];
+                const day = prog.weeklyPlan.find(d => d.dayNumber === dayNumber);
+                if (!day) return;
+
+                if (day.type === 'weekly_test') {
+                    this.startWeeklyReviewTest();
+                    return;
+                }
+
+                day.completed = !day.completed;
+                this.saveStateToCloud();
+                this.renderWorkspace();
+            }
+
+            openStudyDayModal(dayNumber) {
+                const subId = this.state.currentSubjectId;
+                const subject = CURRICULUM_DATA[subId];
+                const prog = this.state.subjectsProgress[subId];
+                const day = prog.weeklyPlan.find(d => d.dayNumber === dayNumber);
+                if (!day) return;
+
+                const topic = subject.topics.find(t => t.id === day.topicId) || subject.topics[0];
+                const modal = document.getElementById('study-day-modal');
+                const content = document.getElementById('study-day-modal-content');
+
+                content.innerHTML = `
+                    <div class="bg-gradient-to-r ${subject.gradient} p-6 text-white flex items-start justify-between gap-4">
+                        <div>
+                            <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/20 text-xs font-bold mb-2">
+                                <i class="fa-regular fa-calendar-check"></i> ${day.dayName} (Ngày ${day.dayNumber}/7) • ${day.reasonLabel}
+                            </div>
+                            <h3 class="text-xl font-extrabold">${topic.name}</h3>
+                        </div>
+                        <button onclick="app.closeStudyDayModal()" class="w-8 h-8 rounded-xl bg-white/20 hover:bg-white/30 flex items-center justify-center text-white cursor-pointer shrink-0">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+
+                    <div class="p-6 space-y-5 max-h-[75vh] overflow-y-auto custom-scroll">
+                        <div>
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2 flex items-center gap-1.5">
+                                <i class="fa-solid fa-book-open text-indigo-600"></i> Trọng tâm Lý thuyết cần nắm
+                            </h4>
+                            <p class="text-sm text-slate-700 leading-relaxed bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                                ${topic.summary}
+                            </p>
+                        </div>
+
+                        <div>
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2 flex items-center gap-1.5">
+                                <i class="fa-solid fa-square-root-variable text-amber-600"></i> Công thức & Quy tắc đóng khung
+                            </h4>
+                            <pre class="text-xs sm:text-sm font-mono bg-amber-50/90 text-amber-950 p-4 rounded-2xl border border-amber-200 whitespace-pre-wrap leading-relaxed">${topic.formula}</pre>
+                        </div>
+
+                        <div class="bg-indigo-50/60 p-4 sm:p-5 rounded-2xl border border-indigo-200">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-indigo-900 mb-2 flex items-center gap-1.5">
+                                <i class="fa-solid fa-bolt text-indigo-600"></i> Bài tập vận dụng nhanh tại chỗ
+                            </h4>
+                            <p class="text-sm font-semibold text-slate-900 mb-3">${topic.miniPractice.q}</p>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2" id="mini-practice-options">
+                                ${topic.miniPractice.options.map((opt, idx) => `
+                                    <button onclick="app.checkMiniPractice(${idx}, ${topic.miniPractice.correct}, '${topic.miniPractice.explain.replace(/'/g, "\\'")}')"
+                                        class="text-left px-3.5 py-2.5 rounded-xl bg-white hover:bg-indigo-100 border border-indigo-200 text-xs sm:text-sm font-medium text-slate-800 transition cursor-pointer">
+                                        <span class="font-bold text-indigo-600 mr-1">${String.fromCharCode(65 + idx)}.</span> ${opt}
+                                    </button>
+                                `).join('')}
+                            </div>
+                            <div id="mini-practice-feedback" class="hidden mt-3 p-3 rounded-xl text-xs leading-relaxed"></div>
+                        </div>
+                    </div>
+
+                    <div class="p-4 sm:px-6 bg-slate-50 border-t border-slate-200 flex items-center justify-between gap-3">
+                        <button onclick="app.closeStudyDayModal()" class="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-600 text-xs sm:text-sm font-semibold hover:bg-slate-100 cursor-pointer">
+                            Đóng
+                        </button>
+                        <button onclick="app.completeDayFromModal(${day.dayNumber})" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold shadow-md shadow-emerald-600/20 flex items-center gap-2 cursor-pointer">
+                            <i class="fa-solid fa-check"></i> Đánh dấu Hoàn thành bài học ${day.dayName}
+                        </button>
+                    </div>
+                `;
+
+                modal.classList.remove('hidden');
+            }
+
+            checkMiniPractice(selectedIdx, correctIdx, explain) {
+                const fb = document.getElementById('mini-practice-feedback');
+                if (!fb) return;
+                fb.classList.remove('hidden');
+                if (selectedIdx === correctIdx) {
+                    fb.className = 'mt-3 p-3 rounded-xl text-xs leading-relaxed bg-emerald-100 text-emerald-900 border border-emerald-300';
+                    fb.innerHTML = `<strong><i class="fa-solid fa-circle-check"></i> Chính xác!</strong> ${explain}`;
+                } else {
+                    fb.className = 'mt-3 p-3 rounded-xl text-xs leading-relaxed bg-rose-100 text-rose-900 border border-rose-300';
+                    fb.innerHTML = `<strong><i class="fa-solid fa-circle-xmark"></i> Chưa đúng!</strong> Đáp án đúng là <strong>${String.fromCharCode(65 + correctIdx)}</strong>. ${explain}`;
+                }
+            }
+
+            completeDayFromModal(dayNumber) {
+                const subId = this.state.currentSubjectId;
+                const prog = this.state.subjectsProgress[subId];
+                const day = prog.weeklyPlan.find(d => d.dayNumber === dayNumber);
+                if (day) day.completed = true;
+                this.closeStudyDayModal();
+                this.saveStateToCloud();
+                this.renderWorkspace();
+                this.showToast(`Đã hoàn thành bài học ${day.dayName}!`, 'emerald');
+            }
+
+            closeStudyDayModal() {
+                document.getElementById('study-day-modal').classList.add('hidden');
+            }
+
+            // Hoàn thành nhanh các ngày học từ Thứ 2 -> Thứ 7 để sẵn sàng làm bài Test Cuối Tuần
+            fastCompleteWeekTasks() {
+                const subId = this.state.currentSubjectId;
+                const prog = this.state.subjectsProgress[subId];
+                if (!prog.hasTakenDiagnostic) {
+                    this.showToast('Môn này chưa làm Test Đầu Vào. Đang mở bài Test Đầu Vào cho bạn!', 'amber');
+                    this.startDiagnosticTest();
+                    return;
+                }
+                prog.weeklyPlan.forEach(d => {
+                    if (d.dayNumber <= 6) d.completed = true;
+                });
+                this.state.activeView = 'dashboard';
+                this.saveStateToCloud();
+                this.renderAll();
+                this.showToast('Đã tick hoàn thành bài học Thứ 2 đến Thứ 7! Bây giờ bạn có thể làm Bài Test Tổng Kết Cuối Tuần.', 'emerald');
+            }
+
+            // Giả lập nhanh: Học sinh sang tuần mới và quên mất 1 chuyên đề cũ từng đạt điểm cao
+            simulateForgottenOldKnowledge() {
+                const subId = this.state.currentSubjectId;
+                const subject = CURRICULUM_DATA[subId];
+                const prog = this.state.subjectsProgress[subId];
+
+                prog.hasTakenDiagnostic = true;
+                prog.currentWeek += 1;
+
+                // Đặt 2 chuyên đề đã vững, 1 chuyên đề yếu và 1 chuyên đề CŨ BỊ QUÊN
+                subject.topics.forEach((t, index) => {
+                    if (index === 0) {
+                        prog.topicMastery[t.id] = { score: 45, status: 'forgotten', lastTestedWeek: prog.currentWeek - 1 };
+                    } else if (index === 1) {
+                        prog.topicMastery[t.id] = { score: 50, status: 'weak', lastTestedWeek: prog.currentWeek - 1 };
+                    } else {
+                        prog.topicMastery[t.id] = { score: 90, status: 'mastered', lastTestedWeek: prog.currentWeek - 1 };
+                    }
+                });
+
+                const forgottenTopicName = subject.topics[0].name;
+                const weakTopicName = subject.topics[1].name;
+
+                prog.testHistory.unshift({
+                    id: 'sim_' + Date.now(),
+                    week: prog.currentWeek - 1,
+                    mode: 'weekly',
+                    title: `Test Tổng Kết Tuần ${prog.currentWeek - 1} (Giả lập)`,
+                    score: 72,
+                    correctCount: 7,
+                    totalCount: 10,
+                    forgottenCount: 1,
+                    weakCount: 1,
+                    timestamp: 'Vừa xong'
+                });
+
+                this.generate7DayStudyPlan(subId);
+                this.state.activeView = 'dashboard';
+                this.saveStateToCloud();
+                this.renderAll();
+                this.showToast(`Phát hiện chuyên đề cũ "${forgottenTopicName}" bị quên và "${weakTopicName}" còn thiếu! Đã tự động xếp lại vào đầu Liệu trình Tuần ${prog.currentWeek}.`, 'purple');
+            }
+
+            // Nạp kịch bản Demo toàn diện cho 4 môn để kiểm tra ngay lập tức
+            loadDemoScenario() {
+                // 1. Toán 11: Đang ở Tuần 2 - Có 1 chuyên đề cũ (Hàm lượng giác) từng đạt 100% ở Tuần 1 nhưng sang cuối Tuần 1 làm bài test lại bị quên (40%), và Đạo hàm còn yếu (50%).
+                const mathProg = this.state.subjectsProgress['math11'];
+                mathProg.hasTakenDiagnostic = true;
+                mathProg.currentWeek = 2;
+                mathProg.topicMastery = {
+                    math_trig: { score: 40, status: 'forgotten', lastTestedWeek: 1 }, // Cũ bị quên -> tự thêm lại vào Tuần 2
+                    math_seq: { score: 100, status: 'mastered', lastTestedWeek: 1 },
+                    math_lim: { score: 85, status: 'mastered', lastTestedWeek: 1 },
+                    math_deriv: { score: 50, status: 'weak', lastTestedWeek: 1 },   // Thiếu -> tự bổ sung vào Tuần 2
+                    math_geo: { score: 80, status: 'mastered', lastTestedWeek: 1 }
+                };
+                mathProg.testHistory = [
+                    {
+                        id: 'demo_m2',
+                        week: 1,
+                        mode: 'weekly',
+                        title: 'Test Tổng Kết Tuần 1',
+                        score: 70,
+                        correctCount: 7,
+                        totalCount: 10,
+                        forgottenCount: 1,
+                        weakCount: 1,
+                        timestamp: 'Hôm qua'
+                    },
+                    {
+                        id: 'demo_m1',
+                        week: 1,
+                        mode: 'diagnostic',
+                        title: 'Test Đầu Vào',
+                        score: 60,
+                        correctCount: 6,
+                        totalCount: 10,
+                        forgottenCount: 0,
+                        weakCount: 2,
+                        timestamp: '7 ngày trước'
+                    }
+                ];
+                this.generate7DayStudyPlan('math11');
+                mathProg.weeklyPlan[0].completed = true;
+                mathProg.weeklyPlan[1].completed = true;
+
+                // 2. Vật Lý 11: Vừa làm xong Test Đầu Vào (Tuần 1), phát hiện yếu phần Sóng cơ & Điện trường
+                const physProg = this.state.subjectsProgress['phys11'];
+                physProg.hasTakenDiagnostic = true;
+                physProg.currentWeek = 1;
+                physProg.topicMastery = {
+                    phys_osc: { score: 100, status: 'mastered', lastTestedWeek: 1 },
+                    phys_wave: { score: 45, status: 'weak', lastTestedWeek: 1 },
+                    phys_field: { score: 35, status: 'weak', lastTestedWeek: 1 },
+                    phys_cap: { score: 85, status: 'mastered', lastTestedWeek: 1 },
+                    phys_dc: { score: 90, status: 'mastered', lastTestedWeek: 1 }
+                };
+                physProg.testHistory = [
+                    {
+                        id: 'demo_p1',
+                        week: 1,
+                        mode: 'diagnostic',
+                        title: 'Test Đầu Vào',
+                        score: 70,
+                        correctCount: 7,
+                        totalCount: 10,
+                        forgottenCount: 0,
+                        weakCount: 2,
+                        timestamp: 'Hôm nay'
+                    }
+                ];
+                this.generate7DayStudyPlan('phys11');
+
+                // 3. Hóa học 11 & Tiếng Anh 11: Để trạng thái chưa Test đầu vào để người dùng tự tay trải nghiệm từ Bước 1
+                this.state.currentSubjectId = 'math11';
+                this.state.activeView = 'dashboard';
+                this.saveStateToCloud();
+                this.renderAll();
+                this.showToast('Đã nạp kịch bản Demo! Môn Toán 11 đang ở Tuần 2 (minh họa tự động thêm lại chuyên đề cũ bị quên vào lộ trình). Môn Hóa & Anh sẵn sàng để bạn test từ đầu!', 'emerald');
+            }
+
+            // ============================================================================
+            // 6. RENDER GIAO DIỆN (UI RENDERING)
+            // ============================================================================
+            renderAll() {
+                this.renderSubjectTabs();
+                this.renderSubjectHero();
+                this.renderTopicMasterySidebar();
+                this.renderTestHistorySidebar();
+                this.renderWorkspace();
+            }
+
+            renderSubjectTabs() {
+                const container = document.getElementById('subject-tabs-container');
+                container.innerHTML = Object.values(CURRICULUM_DATA).map(sub => {
+                    const isActive = sub.id === this.state.currentSubjectId;
+                    const prog = this.state.subjectsProgress[sub.id];
+                    const statusBadge = prog.hasTakenDiagnostic
+                        ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${isActive ? 'bg-white/25 text-white' : 'bg-indigo-100 text-indigo-700'}">Tuần ${prog.currentWeek}</span>`
+                        : `<span class="px-2 py-0.5 rounded-full text-[10px] font-medium ${isActive ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-600'}">Chưa test</span>`;
+
+                    return `
+                        <button onclick="app.switchSubject('${sub.id}')"
+                            class="px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-2.5 shrink-0 transition cursor-pointer ${
+                                isActive
+                                    ? `bg-gradient-to-r ${sub.gradient} text-white shadow-md`
+                                    : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200/80'
+                            }">
+                            <i class="fa-solid ${sub.icon}"></i>
+                            <span>${sub.name}</span>
+                            ${statusBadge}
+                        </button>
+                    `;
+                }).join('');
+            }
+
+            renderSubjectHero() {
+                const subId = this.state.currentSubjectId;
+                const sub = CURRICULUM_DATA[subId];
+                const prog = this.state.subjectsProgress[subId];
+                const banner = document.getElementById('subject-hero-banner');
+
+                const masteredCount = Object.values(prog.topicMastery).filter(m => m.status === 'mastered').length;
+                const weakCount = Object.values(prog.topicMastery).filter(m => m.status === 'weak').length;
+                const forgottenCount = Object.values(prog.topicMastery).filter(m => m.status === 'forgotten').length;
+                const totalTopics = sub.topics.length;
+
+                banner.innerHTML = `
+                    <div class="bg-gradient-to-r ${sub.gradient} rounded-3xl p-5 sm:p-6 text-white shadow-lg flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                        <div class="space-y-1">
+                            <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-white/80">
+                                <i class="fa-solid ${sub.icon}"></i>
+                                <span>Chương trình Lớp 11 • ${prog.hasTakenDiagnostic ? `Đang học Liệu trình Tuần ${prog.currentWeek}` : 'Chưa làm bài kiểm tra phân loại'}</span>
+                            </div>
+                            <h1 class="text-2xl sm:text-3xl font-extrabold">${sub.name}</h1>
+                            <p class="text-xs sm:text-sm text-white/90">${sub.description}</p>
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-2.5 w-full md:w-auto justify-start md:justify-end">
+                            <div class="bg-white/15 backdrop-blur-md px-3.5 py-2 rounded-2xl border border-white/15 text-center min-w-[90px]">
+                                <div class="text-lg font-extrabold">${masteredCount}/${totalTopics}</div>
+                                <div class="text-[10px] uppercase tracking-wider text-white/85">Đã nắm vững</div>
+                            </div>
+                            <div class="bg-rose-500/30 backdrop-blur-md px-3.5 py-2 rounded-2xl border border-white/20 text-center min-w-[90px]">
+                                <div class="text-lg font-extrabold">${weakCount}</div>
+                                <div class="text-[10px] uppercase tracking-wider text-white/90">Cần bổ sung</div>
+                            </div>
+                            <div class="bg-purple-900/40 backdrop-blur-md px-3.5 py-2 rounded-2xl border border-purple-300/30 text-center min-w-[100px]">
+                                <div class="text-lg font-extrabold text-amber-300">${forgottenCount}</div>
+                                <div class="text-[10px] uppercase tracking-wider text-white/90">Cũ bị quên</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderTopicMasterySidebar() {
+                const subId = this.state.currentSubjectId;
+                const sub = CURRICULUM_DATA[subId];
+                const prog = this.state.subjectsProgress[subId];
+
+                document.getElementById('current-week-badge').textContent = prog.hasTakenDiagnostic ? `Liệu trình Tuần ${prog.currentWeek}` : 'Chưa test';
+
+                const listEl = document.getElementById('topic-mastery-list');
+                listEl.innerHTML = sub.topics.map(t => {
+                    const m = prog.topicMastery[t.id];
+                    let barColor = 'bg-slate-300';
+                    let badgeHtml = `<span class="text-[11px] font-semibold text-slate-400">Chưa kiểm tra</span>`;
+                    let scoreText = '--%';
+                    let widthPct = 0;
+
+                    if (m.status === 'mastered') {
+                        barColor = 'bg-emerald-500';
+                        badgeHtml = `<span class="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold"><i class="fa-solid fa-check mr-1"></i>Đã nắm vững</span>`;
+                        scoreText = `${m.score}%`;
+                        widthPct = m.score;
+                    } else if (m.status === 'weak') {
+                        barColor = 'bg-rose-500';
+                        badgeHtml = `<span class="px-2 py-0.5 rounded-md bg-rose-50 text-rose-700 border border-rose-200 text-[10px] font-bold"><i class="fa-solid fa-triangle-exclamation mr-1"></i>Thiếu - Cần học bù</span>`;
+                        scoreText = `${m.score}%`;
+                        widthPct = Math.max(15, m.score);
+                    } else if (m.status === 'forgotten') {
+                        barColor = 'bg-purple-600';
+                        badgeHtml = `<span class="px-2 py-0.5 rounded-md bg-purple-100 text-purple-800 border border-purple-300 text-[10px] font-bold animate-pulse"><i class="fa-solid fa-rotate-left mr-1"></i>Cũ bị quên - Ôn lại!</span>`;
+                        scoreText = `${m.score}%`;
+                        widthPct = Math.max(20, m.score);
+                    }
+
+                    return `
+                        <div class="p-3 rounded-xl bg-slate-50/80 border border-slate-200/80 hover:border-indigo-200 transition">
+                            <div class="flex items-start justify-between gap-2 mb-1.5">
+                                <h4 class="text-xs font-bold text-slate-800 leading-snug">${t.name}</h4>
+                                <span class="text-xs font-extrabold text-slate-700 shrink-0">${scoreText}</span>
+                            </div>
+                            <div class="w-full h-2 bg-slate-200 rounded-full overflow-hidden mb-2">
+                                <div class="h-full ${barColor} rounded-full transition-all duration-500" style="width: ${widthPct}%"></div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                ${badgeHtml}
+                                ${m.lastTestedWeek > 0 ? `<span class="text-[10px] text-slate-400">Test ở Tuần ${m.lastTestedWeek}</span>` : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            renderTestHistorySidebar() {
+                const subId = this.state.currentSubjectId;
+                const prog = this.state.subjectsProgress[subId];
+                const historyEl = document.getElementById('test-history-list');
+
+                if (!prog.testHistory || prog.testHistory.length === 0) {
+                    historyEl.innerHTML = `
+                        <div class="text-center py-6 text-xs text-slate-400">
+                            Chưa có bài kiểm tra nào cho môn này.
+                        </div>
+                    `;
+                    return;
+                }
+
+                historyEl.innerHTML = prog.testHistory.map(h => `
+                    <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-2">
+                        <div>
+                            <div class="text-xs font-bold text-slate-800">${h.title}</div>
+                            <div class="text-[11px] text-slate-500 mt-0.5">
+                                Đúng ${h.correctCount}/${h.totalCount} câu • ${h.timestamp}
+                            </div>
+                            ${h.forgottenCount > 0 ? `<div class="text-[10px] font-bold text-purple-700 mt-0.5"><i class="fa-solid fa-rotate-left"></i> Phát hiện ${h.forgottenCount} kiến thức cũ bị quên</div>` : ''}
+                        </div>
+                        <div class="px-2.5 py-1 rounded-lg font-extrabold text-xs ${h.score >= 70 ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                            ${h.score}%
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            renderWorkspace() {
+                const workspace = document.getElementById('main-workspace');
+                const subId = this.state.currentSubjectId;
+                const sub = CURRICULUM_DATA[subId];
+                const prog = this.state.subjectsProgress[subId];
+
+                // TRẠNG THÁI 1: ĐANG LÀM BÀI KIỂM TRA (TEST ĐẦU VÀO HOẶC TEST CUỐI TUẦN)
+                if (this.state.activeView === 'quiz' && this.state.activeQuiz) {
+                    this.renderQuizView(workspace);
+                    return;
+                }
+
+                // TRẠNG THÁI 2: MÀN HÌNH PHÂN TÍCH KẾT QUẢ BÀI TEST & TẠO LIỆU TRÌNH TUẦN MỚI
+                if (this.state.activeView === 'quiz_result' && this.state.lastQuizAnalysis) {
+                    this.renderQuizResultView(workspace);
+                    return;
+                }
+
+                // TRẠNG THÁI 3: MÔN HỌC CHƯA LÀM BÀI TEST ĐẦU VÀO
+                if (!prog.hasTakenDiagnostic) {
+                    workspace.innerHTML = `
+                        <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-10 text-center">
+                            <div class="w-16 h-16 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto mb-5 text-2xl shadow-inner">
+                                <i class="fa-solid fa-stethoscope"></i>
+                            </div>
+                            <span class="px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-bold uppercase tracking-wider">
+                                Bước 1: Đánh giá năng lực ban đầu
+                            </span>
+                            <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-3 mb-3">
+                                Bài Kiểm Tra Đầu Vào Môn ${sub.name}
+                            </h2>
+                            <p class="text-sm text-slate-600 max-w-xl mx-auto leading-relaxed mb-6">
+                                Để thiết kế <strong>Liệu trình học tập 7 ngày</strong> sát với năng lực của bạn nhất, hãy thực hiện bài kiểm tra phân loại gồm <strong>10 câu hỏi trắc nghiệm</strong> quét qua 5 chuyên đề trọng tâm Lớp 11.
+                            </p>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-2xl mx-auto mb-8 text-left">
+                                <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+                                    <div class="text-xs font-bold text-slate-800 mb-1"><i class="fa-solid fa-bullseye text-indigo-600 mr-1"></i> Bắt bệnh chính xác</div>
+                                    <p class="text-[11px] text-slate-500">Chấm điểm riêng từng chuyên đề để tìm ra phần bạn đang bị hổng.</p>
+                                </div>
+                                <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+                                    <div class="text-xs font-bold text-slate-800 mb-1"><i class="fa-solid fa-calendar-days text-emerald-600 mr-1"></i> Liệu trình 1 tuần</div>
+                                    <p class="text-[11px] text-slate-500">Tự động xếp lịch học lý thuyết, công thức từ Thứ 2 đến Chủ Nhật.</p>
+                                </div>
+                                <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+                                    <div class="text-xs font-bold text-slate-800 mb-1"><i class="fa-solid fa-rotate text-purple-600 mr-1"></i> Vòng lặp chống quên</div>
+                                    <p class="text-[11px] text-slate-500">Cuối tuần kiểm tra lại cả bài mới học và bài cũ đã học ở tuần trước.</p>
+                                </div>
+                            </div>
+
+                            <button onclick="app.startDiagnosticTest()"
+                                class="px-8 py-4 rounded-2xl bg-gradient-to-r ${sub.gradient} hover:opacity-95 text-white font-extrabold text-sm sm:text-base shadow-xl shadow-indigo-500/20 inline-flex items-center gap-3 transition cursor-pointer animate-subtle">
+                                <i class="fa-solid fa-play"></i>
+                                <span>Bắt Đầu Bài Test Đầu Vào (${sub.shortName})</span>
+                            </button>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // TRẠNG THÁI 4: HIỂN THỊ LIỆU TRÌNH HỌC TẬP 1 TUẦN (7-DAY ADAPTIVE PLAN)
+                this.renderWeeklyStudyPlanView(workspace, sub, prog);
+            }
+
+            renderWeeklyStudyPlanView(workspace, sub, prog) {
+                const completedDays = prog.weeklyPlan.filter(d => d.completed).length;
+                const progressPct = Math.round((completedDays / 7) * 100);
+
+                // Đếm xem trong liệu trình tuần này có bao nhiêu ngày là Khôi phục kiến thức cũ bị quên & Bổ sung kiến thức yếu
+                const forgottenDaysCount = prog.weeklyPlan.filter(d => d.reasonTag === 'forgotten_recovery').length;
+                const gapDaysCount = prog.weeklyPlan.filter(d => d.reasonTag === 'fill_gap').length;
+
+                workspace.innerHTML = `
+                    <div class="space-y-6">
+                        <!-- Header Liệu trình 7 ngày -->
+                        <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-5 sm:p-6">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-200">
+                                <div>
+                                    <div class="flex flex-wrap items-center gap-2 mb-1.5">
+                                        <span class="px-3 py-1 rounded-full bg-indigo-600 text-white text-xs font-extrabold uppercase tracking-wide">
+                                            Liệu Trình Học Tập Tuần ${prog.currentWeek}
+                                        </span>
+                                        ${forgottenDaysCount > 0 ? `
+                                            <span class="px-3 py-1 rounded-full bg-purple-100 text-purple-800 border border-purple-300 text-xs font-bold">
+                                                <i class="fa-solid fa-rotate-left mr-1"></i> Có ${forgottenDaysCount} buổi ôn lại kiến thức cũ bị quên
+                                            </span>
+                                        ` : ''}
+                                        ${gapDaysCount > 0 ? `
+                                            <span class="px-3 py-1 rounded-full bg-rose-100 text-rose-800 border border-rose-300 text-xs font-bold">
+                                                <i class="fa-solid fa-screwdriver-wrench mr-1"></i> Có ${gapDaysCount} buổi bù lỗ hổng kiến thức
+                                            </span>
+                                        ` : ''}
+                                    </div>
+                                    <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900">
+                                        Lộ Trình Cá Nhân Hóa 7 Ngày - Môn ${sub.name}
+                                    </h2>
+                                    <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
+                                        Bấm vào từng ngày để xem <strong>Lý thuyết trọng tâm, Công thức & Bài tập</strong>, sau đó làm <strong>Bài Test Tổng Kết Cuối Tuần</strong>.
+                                    </p>
+                                </div>
+
+                                <div class="flex items-center gap-2 shrink-0">
+                                    <button onclick="app.startWeeklyReviewTest()"
+                                        class="px-4 py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-extrabold text-xs sm:text-sm shadow-md flex items-center gap-2 transition cursor-pointer">
+                                        <i class="fa-solid fa-file-circle-check"></i>
+                                        <span>Làm Bài Test Cuối Tuần ${prog.currentWeek}</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Thanh tiến độ hoàn thành tuần -->
+                            <div class="mt-4">
+                                <div class="flex items-center justify-between text-xs font-bold text-slate-700 mb-1.5">
+                                    <span>Tiến độ hoàn thành Liệu trình Tuần ${prog.currentWeek}</span>
+                                    <span class="text-indigo-600">${completedDays}/7 ngày (${progressPct}%)</span>
+                                </div>
+                                <div class="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden border border-slate-200/60">
+                                    <div class="h-full bg-gradient-to-r from-indigo-600 to-emerald-500 rounded-full transition-all duration-500" style="width: ${progressPct}%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Danh sách 7 Ngày Học (Thứ 2 -> Chủ Nhật) -->
+                        <div class="space-y-3.5">
+                            ${prog.weeklyPlan.map(day => {
+                                if (day.type === 'weekly_test') {
+                                    // Card đặc biệt cho Ngày 7: Bài Kiểm Tra Tổng Kết Tuần & Kiểm tra kiến thức cũ
+                                    return `
+                                        <div class="rounded-3xl p-5 sm:p-6 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white shadow-lg border border-indigo-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                                            <div class="flex items-start gap-4">
+                                                <div class="w-12 h-12 rounded-2xl bg-amber-400/20 border border-amber-400/40 text-amber-300 flex flex-col items-center justify-center shrink-0 font-extrabold">
+                                                    <span class="text-[10px] uppercase">Ngày 7</span>
+                                                    <i class="fa-solid fa-trophy text-base"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="flex flex-wrap items-center gap-2 mb-1">
+                                                        <span class="text-xs font-extrabold uppercase tracking-wider text-amber-300">${day.dayName} • Chốt Liệu Trình Tuần ${prog.currentWeek}</span>
+                                                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-white/15 text-white">Kiểm tra bài mới + Rà soát bài cũ</span>
+                                                    </div>
+                                                    <h3 class="text-base sm:text-lg font-extrabold text-white">${day.topicName}</h3>
+                                                    <p class="text-xs text-indigo-200 mt-1 leading-relaxed">
+                                                        Hệ thống sẽ kiểm tra những kiến thức vừa bổ sung trong tuần này, đồng thời <strong>hỏi ngẫu nhiên các kiến thức cũ đã học ở tuần trước</strong>. Nếu quên kiến thức cũ, hệ thống sẽ tự động xếp lại vào Liệu trình Tuần ${prog.currentWeek + 1}!
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <button onclick="app.startWeeklyReviewTest()"
+                                                class="w-full sm:w-auto shrink-0 px-5 py-3.5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs sm:text-sm shadow-lg transition flex items-center justify-center gap-2 cursor-pointer">
+                                                <i class="fa-solid fa-pen-to-square"></i>
+                                                <span>Bắt Đầu Test Tuần ${prog.currentWeek}</span>
+                                            </button>
+                                        </div>
+                                    `;
+                                }
+
+                                const topicObj = sub.topics.find(t => t.id === day.topicId) || sub.topics[0];
+                                return `
+                                    <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border ${day.completed ? 'border-emerald-300 bg-emerald-50/20' : day.reasonTag === 'forgotten_recovery' ? 'border-purple-300 bg-purple-50/10' : 'border-slate-200'} hover:shadow-md transition flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                                        <div class="flex items-start gap-3.5 flex-1">
+                                            <!-- Nút Checkbox hoàn thành ngày -->
+                                            <button onclick="app.toggleDayComplete(${day.dayNumber})"
+                                                title="Đánh dấu hoàn thành"
+                                                class="w-11 h-11 rounded-2xl flex flex-col items-center justify-center shrink-0 font-bold transition cursor-pointer border ${
+                                                    day.completed
+                                                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
+                                                        : 'bg-slate-100 hover:bg-indigo-50 text-slate-700 border-slate-200'
+                                                }">
+                                                ${day.completed ? '<i class="fa-solid fa-check text-base"></i>' : `<span class="text-[10px] uppercase text-slate-400">Ngày</span><span class="text-sm font-extrabold leading-none">${day.dayNumber}</span>`}
+                                            </button>
+
+                                            <div class="space-y-1 flex-1">
+                                                <div class="flex flex-wrap items-center gap-2">
+                                                    <span class="text-xs font-extrabold text-slate-900">${day.dayName}</span>
+                                                    <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${day.badgeClass}">
+                                                        ${day.reasonTag === 'forgotten_recovery' ? '<i class="fa-solid fa-rotate-left mr-1"></i>' : day.reasonTag === 'fill_gap' ? '<i class="fa-solid fa-bolt mr-1"></i>' : ''}
+                                                        ${day.reasonLabel}
+                                                    </span>
+                                                    ${day.completed ? '<span class="text-[11px] font-bold text-emerald-600"><i class="fa-solid fa-circle-check"></i> Đã học xong</span>' : ''}
+                                                </div>
+
+                                                <h3 class="text-sm sm:text-base font-bold ${day.completed ? 'line-through text-slate-400' : 'text-slate-900'}">
+                                                    ${day.topicName}
+                                                </h3>
+
+                                                <p class="text-xs text-slate-600 line-clamp-2">
+                                                    ${day.type === 'review_prep'
+                                                        ? `Ôn tập hệ thống công thức tuần này & đọc lướt lại các chuyên đề cũ đã vững (${day.oldTopicsNote}) để chuẩn bị cho bài kiểm tra Chủ Nhật.`
+                                                        : topicObj.summary}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <div class="flex items-center gap-2 w-full sm:w-auto justify-end border-t sm:border-t-0 pt-3 sm:pt-0 border-slate-100">
+                                            <button onclick="app.openStudyDayModal(${day.dayNumber})"
+                                                class="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs flex items-center justify-center gap-1.5 transition cursor-pointer">
+                                                <i class="fa-solid fa-book-open-reader"></i>
+                                                <span>Học Lý thuyết & Bài tập</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Giao diện làm bài trắc nghiệm (Test Đầu Vào / Test Cuối Tuần)
+            renderQuizView(workspace) {
+                const quiz = this.state.activeQuiz;
+                const answeredCount = quiz.userAnswers.filter(a => a !== null).length;
+                const totalQ = quiz.questions.length;
+
+                workspace.innerHTML = `
+                    <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+                        <!-- Đầu trang bài kiểm tra -->
+                        <div class="p-5 sm:p-6 bg-slate-900 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div>
+                                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-200 text-xs font-bold mb-2">
+                                    <i class="fa-solid fa-clipboard-question"></i>
+                                    <span>${quiz.mode === 'diagnostic' ? 'Đánh giá phân loại đầu vào' : 'Đánh giá cuối tuần & Kiểm tra kiến thức cũ'}</span>
+                                </div>
+                                <h2 class="text-xl sm:text-2xl font-extrabold">${quiz.title}</h2>
+                                <p class="text-xs text-slate-300 mt-1">${quiz.subtitle}</p>
+                            </div>
+
+                            <div class="flex flex-wrap items-center gap-2 shrink-0">
+                                <button onclick="app.autoFillCurrentQuiz('mixed')"
+                                    title="Tự động chọn đáp án mẫu để kiểm thử nhanh thuật toán"
+                                    class="px-3.5 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-400/30 text-xs font-bold transition cursor-pointer">
+                                    <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Điền nhanh đáp án mẫu
+                                </button>
+                                <button onclick="app.switchSubject(app.state.currentSubjectId)"
+                                    class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 text-xs font-semibold transition cursor-pointer">
+                                    Hủy
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Thanh tiến độ trả lời -->
+                        <div class="bg-slate-50 px-6 py-3 border-b border-slate-200 flex items-center justify-between text-xs font-bold text-slate-600">
+                            <span>Đã trả lời: <strong class="text-indigo-600">${answeredCount}/${totalQ}</strong> câu hỏi</span>
+                            <span>Chấm điểm tự động theo từng chuyên đề</span>
+                        </div>
+
+                        <!-- Danh sách câu hỏi -->
+                        <div class="p-5 sm:p-6 space-y-6">
+                            ${quiz.questions.map((q, qIdx) => {
+                                let tagBadge = '';
+                                if (q.questionCategory === 'old_retention_check') {
+                                    tagBadge = `<span class="px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-800 border border-purple-300 text-[11px] font-bold"><i class="fa-solid fa-clock-rotate-left mr-1"></i>Kiểm tra lại kiến thức cũ: ${q.topicName}</span>`;
+                                } else if (q.questionCategory === 'relearn_forgotten') {
+                                    tagBadge = `<span class="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300 text-[11px] font-bold"><i class="fa-solid fa-rotate mr-1"></i>Kiểm tra kiến thức phục hồi: ${q.topicName}</span>`;
+                                } else {
+                                    tagBadge = `<span class="px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 text-[11px] font-bold">Chuyên đề: ${q.topicName}</span>`;
+                                }
+
+                                return `
+                                    <div class="p-4 sm:p-5 rounded-2xl bg-slate-50/70 border border-slate-200/90 space-y-3.5">
+                                        <div class="flex flex-wrap items-center justify-between gap-2">
+                                            <span class="text-xs font-extrabold uppercase tracking-wider text-slate-400">Câu hỏi ${qIdx + 1}</span>
+                                            ${tagBadge}
+                                        </div>
+                                        <h3 class="text-sm sm:text-base font-bold text-slate-900 leading-relaxed">${q.q}</h3>
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                            ${q.options.map((opt, optIdx) => {
+                                                const isSelected = quiz.userAnswers[qIdx] === optIdx;
+                                                return `
+                                                    <button onclick="app.selectQuizOption(${qIdx}, ${optIdx})"
+                                                        class="text-left p-3.5 rounded-xl border text-xs sm:text-sm font-medium transition flex items-start gap-2.5 cursor-pointer ${
+                                                            isSelected
+                                                                ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm font-semibold'
+                                                                : 'bg-white hover:bg-indigo-50/60 text-slate-700 border-slate-200'
+                                                        }">
+                                                        <span class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 ${
+                                                            isSelected ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
+                                                        }">${String.fromCharCode(65 + optIdx)}</span>
+                                                        <span class="mt-0.5">${opt}</span>
+                                                    </button>
+                                                `;
+                                            }).join('')}
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+
+                        <!-- Nút nộp bài -->
+                        <div class="p-5 sm:p-6 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+                            <div class="text-xs text-slate-500">
+                                <i class="fa-solid fa-shield-halved text-indigo-600 mr-1"></i>
+                                Hệ thống sẽ phân tích kết quả từng chuyên đề và tự động cập nhật liệu trình học 1 tuần.
+                            </div>
+                            <button onclick="app.submitActiveQuiz()"
+                                class="w-full sm:w-auto px-8 py-4 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-sm shadow-lg shadow-indigo-600/25 flex items-center justify-center gap-2 transition cursor-pointer">
+                                <i class="fa-solid fa-paper-plane"></i>
+                                <span>Nộp Bài & Xem Phân Tích Liệu Trình</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Giao diện Báo cáo Phân tích sau Bài Test (Diagnostic hoặc Weekly Review)
+            renderQuizResultView(workspace) {
+                const res = this.state.lastQuizAnalysis;
+                const subId = this.state.currentSubjectId;
+                const sub = CURRICULUM_DATA[subId];
+                const prog = this.state.subjectsProgress[subId];
+
+                workspace.innerHTML = `
+                    <div class="space-y-6">
+                        <!-- Card Tổng quan Kết quả & Phân tích Thuật toán -->
+                        <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-8">
+                            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-slate-200">
+                                <div>
+                                    <span class="px-3 py-1 rounded-full bg-indigo-100 text-indigo-800 text-xs font-extrabold uppercase">
+                                        ${res.mode === 'diagnostic' ? 'Kết Quả Bài Test Đầu Vào' : `Kết Quả Bài Test Tổng Kết Tuần ${res.weekCompleted}`}
+                                    </span>
+                                    <h2 class="text-2xl font-extrabold text-slate-900 mt-2">
+                                        Báo Cáo Phân Tích Kiến Thức - ${sub.name}
+                                    </h2>
+                                    <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
+                                        Trả lời đúng <strong>${res.totalCorrect}/${res.totalQuestions}</strong> câu hỏi (${res.overallScore}%). Dưới đây là quyết định điều chỉnh liệu trình của hệ thống:
+                                    </p>
+                                </div>
+
+                                <div class="w-20 h-20 rounded-3xl ${res.overallScore >= 70 ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-amber-50 border-amber-200 text-amber-700'} border-2 flex flex-col items-center justify-center shrink-0">
+                                    <span class="text-2xl font-extrabold">${res.overallScore}%</span>
+                                    <span class="text-[10px] font-bold uppercase">Điểm số</span>
+                                </div>
+                            </div>
+
+                            <!-- Ba nhóm phân loại quan trọng -->
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-6">
+                                <!-- Nhóm 1: Kiến thức cũ bị quên (Spaced Repetition) -->
+                                <div class="p-4 rounded-2xl bg-purple-50/90 border border-purple-200">
+                                    <div class="flex items-center gap-2 text-purple-900 font-extrabold text-xs uppercase mb-2">
+                                        <i class="fa-solid fa-rotate-left text-purple-600"></i>
+                                        <span>Kiến thức cũ bị quên (${res.newlyForgottenOld.length})</span>
+                                    </div>
+                                    ${res.newlyForgottenOld.length > 0 ? `
+                                        <ul class="space-y-1.5 text-xs text-purple-950 font-semibold">
+                                            ${res.newlyForgottenOld.map(item => `<li>• ${item.topicName} (${item.pct}%)</li>`).join('')}
+                                        </ul>
+                                        <p class="text-[11px] text-purple-700 mt-2 bg-white/80 p-2 rounded-lg border border-purple-200">
+                                            <strong>Tự động xử lý:</strong> Chuyên đề này từng đạt điểm cao nhưng nay bạn làm sai câu ôn tập. Hệ thống sẽ <strong>thêm lại vào đầu Liệu trình Tuần ${res.weekCompleted + 1}</strong>!
+                                        </p>
+                                    ` : `
+                                        <p class="text-xs text-purple-700">Tuyệt vời! Bạn không bị quên chuyên đề cũ nào đã học ở các tuần trước.</p>
+                                    `}
+                                </div>
+
+                                <!-- Nhóm 2: Kiến thức còn thiếu / Chưa đạt (<70%) -->
+                                <div class="p-4 rounded-2xl bg-rose-50/90 border border-rose-200">
+                                    <div class="flex items-center gap-2 text-rose-900 font-extrabold text-xs uppercase mb-2">
+                                        <i class="fa-solid fa-triangle-exclamation text-rose-600"></i>
+                                        <span>Kiến thức còn thiếu (${res.stillWeak.length})</span>
+                                    </div>
+                                    ${res.stillWeak.length > 0 ? `
+                                        <ul class="space-y-1.5 text-xs text-rose-950 font-semibold">
+                                            ${res.stillWeak.map(item => `<li>• ${item.topicName} (${item.pct}%)</li>`).join('')}
+                                        </ul>
+                                        <p class="text-[11px] text-rose-700 mt-2 bg-white/80 p-2 rounded-lg border border-rose-200">
+                                            <strong>Tự động xử lý:</strong> Sẽ được phân bổ lý thuyết & bài tập bổ sung trong Liệu trình 7 ngày.
+                                        </p>
+                                    ` : `
+                                        <p class="text-xs text-rose-700">Tất cả các chuyên đề mới kiểm tra đều đã đạt từ 70% trở lên!</p>
+                                    `}
+                                </div>
+
+                                <!-- Nhóm 3: Đã nắm vững (≥70%) -->
+                                <div class="p-4 rounded-2xl bg-emerald-50/90 border border-emerald-200">
+                                    <div class="flex items-center gap-2 text-emerald-900 font-extrabold text-xs uppercase mb-2">
+                                        <i class="fa-solid fa-circle-check text-emerald-600"></i>
+                                        <span>Đã nắm vững (${res.newlyMastered.length + res.retainedOld.length})</span>
+                                    </div>
+                                    ${(res.newlyMastered.length + res.retainedOld.length) > 0 ? `
+                                        <ul class="space-y-1.5 text-xs text-emerald-950 font-semibold">
+                                            ${[...res.newlyMastered, ...res.retainedOld].map(item => `<li>• ${item.topicName} (${item.pct}%)</li>`).join('')}
+                                        </ul>
+                                        <p class="text-[11px] text-emerald-700 mt-2 bg-white/80 p-2 rounded-lg border border-emerald-200">
+                                            Sẽ được kiểm tra ngắt quãng ở cuối các tuần sau để đảm bảo bạn không bị quên.
+                                        </p>
+                                    ` : `
+                                        <p class="text-xs text-emerald-700">Hãy hoàn thành liệu trình tuần để chuyển các chuyên đề sang trạng thái Đã nắm vững.</p>
+                                    `}
+                                </div>
+                            </div>
+
+                            <!-- Nút hành động chính: Xem Liệu trình Tuần 1 hoặc Tạo Liệu trình Tuần tiếp theo -->
+                            <div class="flex flex-wrap items-center justify-end gap-3 pt-4 border-t border-slate-200">
+                                ${res.mode === 'diagnostic' ? `
+                                    <button onclick="app.switchSubject('${subId}')"
+                                        class="px-7 py-4 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-sm shadow-lg shadow-indigo-600/25 flex items-center gap-2 cursor-pointer">
+                                        <i class="fa-solid fa-calendar-check"></i>
+                                        <span>Xem Liệu Trình Học Tập 1 Tuần Vừa Được Tạo</span>
+                                    </button>
+                                ` : `
+                                    <button onclick="app.generateNextWeekPlanFromResult()"
+                                        class="px-7 py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:opacity-95 text-white font-extrabold text-sm shadow-xl shadow-indigo-600/25 flex items-center gap-2.5 cursor-pointer animate-subtle">
+                                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                        <span>Tạo Liệu Trình Tuần Tiếp Theo (Tuần ${res.weekCompleted + 1}) - Bù Kiến Thức Thiếu & Ôn Lại Bài Cũ</span>
+                                    </button>
+                                `}
+                            </div>
+                        </div>
+
+                        <!-- Chi tiết đáp án và lời giải từng câu -->
+                        <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-6">
+                            <h3 class="text-base font-extrabold text-slate-900 mb-4 flex items-center gap-2">
+                                <i class="fa-solid fa-magnifying-glass-chart text-indigo-600"></i>
+                                Chi Tiết Đáp Án & Giải Thích Từng Câu
+                            </h3>
+                            <div class="space-y-4">
+                                ${res.questions.map((q, idx) => {
+                                    const userAns = res.userAnswers[idx];
+                                    const isCorrect = userAns === q.correct;
+                                    return `
+                                        <div class="p-4 rounded-2xl border ${isCorrect ? 'bg-emerald-50/40 border-emerald-200' : 'bg-rose-50/40 border-rose-200'}">
+                                            <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+                                                <span class="text-xs font-extrabold ${isCorrect ? 'text-emerald-700' : 'text-rose-700'}">
+                                                    ${isCorrect ? '<i class="fa-solid fa-circle-check mr-1"></i> Câu ' + (idx + 1) + ': Chính xác' : '<i class="fa-solid fa-circle-xmark mr-1"></i> Câu ' + (idx + 1) + ': Trả lời sai'}
+                                                </span>
+                                                <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-white border border-slate-200 text-slate-600">
+                                                    ${q.topicName} ${q.questionCategory === 'old_retention_check' ? '(Câu kiểm tra kiến thức cũ)' : ''}
+                                                </span>
+                                            </div>
+                                            <p class="text-sm font-bold text-slate-900 mb-2">${q.q}</p>
+                                            <div class="text-xs space-y-1 mb-2">
+                                                <div>Bạn chọn: <strong class="${isCorrect ? 'text-emerald-700' : 'text-rose-700'}">${String.fromCharCode(65 + userAns)}. ${q.options[userAns]}</strong></div>
+                                                ${!isCorrect ? `<div>Đáp án đúng: <strong class="text-emerald-700">${String.fromCharCode(65 + q.correct)}. ${q.options[q.correct]}</strong></div>` : ''}
+                                            </div>
+                                            <div class="text-xs text-slate-600 bg-white/90 p-3 rounded-xl border border-slate-200/80">
+                                                <strong>Giải thích:</strong> ${q.explain}
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Khởi chạy ứng dụng khi tải trang
+        window.onload = () => {
+            window.app = new SmartGrade11App();
+        };
+    </script>
+</body>
+</html>
